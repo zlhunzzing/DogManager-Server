@@ -10,7 +10,7 @@ import * as cors from "cors";
 createConnection().then(() => {
   // create and setup express app
   const app = express();
-  const PORT = 3000;
+  const PORT: number = 3000;
   app.use(bodyParser.json());
   app.use(cors());
 
