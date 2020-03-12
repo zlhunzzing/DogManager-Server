@@ -3,6 +3,10 @@ import controller from "../controller";
 const adminController = controller.adminController;
 const router = express.Router({ strict: true });
 
-router.get("/info", adminController.info);
+router.post("/events/entry", adminController.addEventController);
+
+router.get("/events/list", adminController.getEventListController);
+
+router.get("/events/entry/:id", adminController.getEventEntryController);
 
 export default router;
