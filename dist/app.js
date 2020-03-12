@@ -12,12 +12,13 @@ typeorm_1.createConnection().then(connection => {
     const userRepository = connection.getRepository(User_1.User);
     // create and setup express app
     const app = express();
+    const PORT = 3000;
     app.use(bodyParser.json());
     app.use(cors());
-    app.use("./", (req, res) => res.send("hello"));
+    app.use("/", (req, res) => res.send("hello"));
     app.use("/user", user_1.default);
     app.use("/admin", admin_1.default);
-    // register routes
+    // typeORM 예시 코드
     //   app.get("/users", async function(req: Request, res: Response) {
     //     const users = await userRepository.find();
     //     res.json(users);
@@ -42,5 +43,5 @@ typeorm_1.createConnection().then(connection => {
     //     return res.send(results);
     //   });
     // start express server
-    app.listen(3000, () => console.log("app is listening in port 3000"));
+    app.listen(PORT, () => console.log(`app is listening in port ${PORT}`));
 });
