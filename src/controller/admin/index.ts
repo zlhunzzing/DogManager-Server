@@ -49,5 +49,15 @@ export default {
       .where("events.id = :id", { id: req.params.id })
       .getOne();
     res.status(200).json(result);
+  },
+
+  deleteEventEntryController: async (req: Request, res: Response) => {
+    const result = await getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(Events)
+      .where("id = :id", { id: req.params.id })
+      .execute();
+    res.status(200).end();
   }
 };
