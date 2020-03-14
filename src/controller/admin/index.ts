@@ -33,14 +33,14 @@ export default {
       .into(Events)
       .values([
         {
-          event_title: event_title,
-          start_date: start_date,
-          end_date: end_date,
+          event_title,
+          start_date,
+          end_date,
           detail_page_url: detail_page_url ? detail_page_url : null,
           button_url: button_url ? button_url : null,
-          button_image: button_image,
-          banner_image: banner_image,
-          page_image: page_image
+          button_image,
+          banner_image,
+          page_image
         }
       ])
       .execute();
