@@ -9,6 +9,8 @@ router.get("/events/list", adminController.getEventListController);
 
 router.get("/events/entry/:id", adminController.getEventEntryController);
 
-router.delete("/events/entry/:id", adminController.deleteEventEntryController);
+router.delete("/events/entry/:id", adminController.deleteEventController);
+
+router.put("/events/entry/:id", adminController.putEventController);
 
 export default router;
