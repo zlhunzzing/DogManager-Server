@@ -21,6 +21,7 @@ const dataForCreateEvent = (num: number = 1) => {
 
 describe("Implemented testcase", () => {
   before(async () => {
+    console.log(process.env.NODE_ENV);
     await createTypeormConnection();
   });
 

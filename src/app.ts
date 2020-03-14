@@ -12,7 +12,7 @@ const PORT: number = 3000;
 app.use(bodyParser.json());
 app.use(cors());
 
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV !== "test") {
   createTypeormConnection();
 }
 app.use("/api/user", userRouter);
