@@ -6,7 +6,7 @@
     "port": 3306,
     "username": "root",
     "password": "",
-    "database": "dogmate",
+    "database": "dogmate_dev",
     "entities": ["src/entity/*.ts"],
     "logging": true,
     "synchronize": true
@@ -23,5 +23,17 @@
     "logging": false,
     "synchronize": true,
     "dropSchema": true
+  },
+  {
+    "name": "production",
+    "type": "mysql",
+    "host": "localhost",
+    "port": 3306,
+    "username": "root",
+    "password": "",
+    "database": "dogmate",
+    "entities": ["dist/entity/*.js"],
+    "logging": false,
+    "synchronize": true
   }
 ]

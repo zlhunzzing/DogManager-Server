@@ -5,6 +5,8 @@ import app from "../app";
 chai.use(chaiHttp);
 const expect = chai.expect;
 import { createTypeormConnection } from "../utils/createTypeormConnection";
+import { Events } from "../entity/Events";
+import { getRepository, getConnection } from "typeorm";
 
 const dataForCreateEvent = (num: number = 1) => {
   return {
@@ -23,26 +25,36 @@ describe("Implemented testcase", () => {
   before(async () => {
     await createTypeormConnection();
   });
-
-  it("should create a new event", done => {
-    const agent = chai.request.agent(app);
-    agent
-      .post("/api/admin/events/entry")
-      .send(dataForCreateEvent())
-      .end((err, res) => {
-        if (err) done(err);
-        expect(res).to.have.status(201);
-        done();
-      });
+  afterEach(async () => {
+    const repository = await getRepository(Events);
+    await repository.query(`TRUNCATE TABLE events;`);
   });
 
-  it("should get all event lists", done => {
-    const agent = chai.request.agent(app);
-    agent
-      .post("/api/admin/events/entry")
-      .send(dataForCreateEvent(1))
-      .send(dataForCreateEvent(2))
-      .then(() => {
+  describe("POST Method", () => {
+    it("should create a new event", done => {
+      const agent = chai.request.agent(app);
+      agent
+        .post("/api/admin/events/entry")
+        .send(dataForCreateEvent())
+        .end((err, res) => {
+          if (err) done(err);
+          expect(res).to.have.status(201);
+          done();
+        });
+    });
+  });
+  describe("Data exist Already", () => {
+    beforeEach(() => {
+      getConnection()
+        .createQueryBuilder()
+        .insert()
+        .into(Events)
+        .values([dataForCreateEvent(1), dataForCreateEvent(3)])
+        .execute();
+    });
+    describe("GET Method", () => {
+      it("should get all event lists", done => {
+        const agent = chai.request.agent(app);
         agent.get("/api/admin/events/list").end((err, res) => {
           if (err) done(err);
           expect(res).to.have.status(200);
@@ -57,43 +69,9 @@ describe("Implemented testcase", () => {
           done();
         });
       });
-  });
 
-  it("should get information of selected event", done => {
-    const agent = chai.request.agent(app);
-    // const insertData = await agent.post("/api/admin/events/entry").send({
-    //   event_title: "postman2",
-    //   start_date: "15:53",
-    //   end_date: "16:00",
-    //   detail_page_url: "d-page",
-    //   button_url: "b-url",
-    //   button_image: "b-image",
-    //   banner_image: "banner image",
-    //   page_image: "page image"
-    // });
-
-    // await agent.get("/api/admin/events/entry/1").end((err, result) => {
-    //   console.log("이거: ", result.body);
-    //   expect(result).to.have.status(200);
-    //   expect(result.body).has.all.keys([
-    //     "event_title",
-    //     "start_date",
-    //     "end_date",
-    //     "detail_page_url",
-    //     "button_url",
-    //     "button_image",
-    //     "banner_image",
-    //     "page_image",
-    //     "id",
-    //     "created_at",
-    //     "updated_at",
-    //     "is_deleted"
-    //   ]);
-    // });
-    agent
-      .post("/api/admin/events/entry")
-      .send(dataForCreateEvent())
-      .then(() => {
+      it("should get information of selected event", done => {
+        const agent = chai.request.agent(app);
         agent.get("/api/admin/events/entry/1").end((err, res) => {
           if (err) done(err);
           expect(res).to.have.status(200);
@@ -114,5 +92,37 @@ describe("Implemented testcase", () => {
           done();
         });
       });
+    });
+
+    describe("PUT Method", () => {
+      it("should edit a information of event", done => {
+        const agent = chai.request.agent(app);
+        agent
+          .put("/api/admin/events/entry/1")
+          .send(dataForCreateEvent(2))
+          .then(() => {
+            agent.get("/api/admin/events/entry/1").end((err, res) => {
+              if (err) done(err);
+              expect(res).to.have.status(200);
+              expect(res.body.event_title).to.equal("new event 2");
+              done();
+            });
+          });
+      });
+    });
+
+    describe("DELETE Method", () => {
+      it("should delete event", done => {
+        const agent = chai.request.agent(app);
+        agent.delete("/api/admin/events/entry/1").then(() => {
+          agent.get("/api/admin/events/list").end((err, res) => {
+            if (err) done(err);
+            expect(res).to.have.status(200);
+            expect(res.body.eventList.length).to.equal(1);
+            done();
+          });
+        });
+      });
+    });
   });
 });
