@@ -5,18 +5,22 @@ import { createConnection } from "typeorm";
 import adminRouter from "./routes/admin";
 import userRouter from "./routes/user";
 import * as cors from "cors";
+import { createTypeormConnection } from "./utils/createTypeormConnection";
 
-// create typeorm connection
-createConnection().then(() => {
-  // create and setup express app
-  const app = express();
-  const PORT = 3000;
-  app.use(bodyParser.json());
-  app.use(cors());
+const app = express();
+const PORT: number = 3000;
+app.use(bodyParser.json());
+app.use(cors());
 
-  app.use("/api/user", userRouter);
-  app.use("/api/admin", adminRouter);
+if (process.env.NODE_ENV === "development") {
+  createTypeormConnection();
+}
+app.use("/api/user", userRouter);
+app.use("/api/admin", adminRouter);
 
-  // start express server
-  app.listen(PORT, () => console.log(`app is listening in port ${PORT}`));
+// start express server
+app.listen(PORT, async () => {
+  console.log(`app is listening in port ${PORT}`);
 });
+
+export default app;
