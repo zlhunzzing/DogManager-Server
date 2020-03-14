@@ -50,5 +50,5 @@ export class Events {
     type: "boolean",
     default: false
   })
-  is_deleted: string;
+  is_deleted: boolean;
 }

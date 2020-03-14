@@ -72,7 +72,7 @@ describe("Implemented testcase", () => {
     //   page_image: "page image"
     // });
 
-    // await insertData.get("/api/admin/events/entry/1").end((err, result) => {
+    // await agent.get("/api/admin/events/entry/1").end((err, result) => {
     //   console.log("이거: ", result.body);
     //   expect(result).to.have.status(200);
     //   expect(result.body).has.all.keys([
