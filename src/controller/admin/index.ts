@@ -23,7 +23,7 @@ export default {
   },
 
   deleteEventController: async (req: Request, res: Response) => {
-    adminService.deleteEventService(req.params.id);
+    await adminService.deleteEventService(req.params.id);
     res.status(200).end();
   }
 };

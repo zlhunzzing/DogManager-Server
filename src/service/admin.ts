@@ -79,7 +79,8 @@ export default {
   getEventEntryService: async id => {
     const result = await getRepository(Events).findOne({
       where: {
-        id
+        id,
+        is_deleted: false
       }
     });
     return result;

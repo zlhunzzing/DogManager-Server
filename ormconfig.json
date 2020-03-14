@@ -20,7 +20,7 @@
     "password": "",
     "database": "dogmate_test",
     "entities": ["src/entity/*.ts"],
-    "logging": true,
+    "logging": false,
     "synchronize": true,
     "dropSchema": true
   },
@@ -33,7 +33,7 @@
     "password": "",
     "database": "dogmate",
     "entities": ["dist/entity/*.js"],
-    "logging": true,
+    "logging": false,
     "synchronize": true
   }
 ]
