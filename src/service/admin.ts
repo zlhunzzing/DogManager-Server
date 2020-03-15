@@ -3,61 +3,28 @@ import { getRepository } from "typeorm";
 import { Events } from "../entity/Events";
 
 export default {
-  addEventService: data => {
-    const {
-      event_title,
-      start_date,
-      end_date,
-      detail_page_url,
-      button_url,
-      button_image,
-      banner_image,
-      page_image
-    } = data;
-    return getConnection()
-      .createQueryBuilder()
-      .insert()
-      .into(Events)
-      .values([
-        {
-          event_title,
-          start_date,
-          end_date,
-          detail_page_url: detail_page_url ? detail_page_url : null,
-          button_url: button_url ? button_url : null,
-          button_image,
-          banner_image,
-          page_image
-        }
-      ])
-      .execute();
+  addEventService: async data => {
+    const events = new Events();
+    const forInsertData = {
+      ...events,
+      ...data,
+      detail_page_url: data.detail_page_url ? data.detail_page_url : null,
+      button_url: data.button_url ? data.button_url : null
+    };
+    return await getRepository(Events).save(forInsertData);
   },
 
   putEventService: async (data, id) => {
-    const {
-      event_title,
-      start_date,
-      end_date,
-      detail_page_url,
-      button_url,
-      button_image,
-      banner_image,
-      page_image
-    } = data;
     const result = await getRepository(Events).findOne({
       where: {
         id
       }
     });
-    result.event_title = event_title;
-    result.start_date = start_date;
-    result.end_date = end_date;
-    result.detail_page_url = detail_page_url;
-    result.button_url = button_url;
-    result.button_image = button_image;
-    result.banner_image = banner_image;
-    result.page_image = page_image;
-    return await getRepository(Events).save(result);
+    const updatedResult = {
+      ...result,
+      ...data
+    };
+    return await getRepository(Events).save(updatedResult);
   },
 
   getEventListService: async () => {
