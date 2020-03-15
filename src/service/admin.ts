@@ -3,19 +3,15 @@ import { getRepository } from "typeorm";
 import { Events } from "../entity/Events";
 
 export default {
-  addEventService: data => {
-    return getConnection()
-      .createQueryBuilder()
-      .insert()
-      .into(Events)
-      .values([
-        {
-          ...data,
-          detail_page_url: data.detail_page_url ? data.detail_page_url : null,
-          button_url: data.button_url ? data.button_url : null
-        }
-      ])
-      .execute();
+  addEventService: async data => {
+    const events = new Events();
+    const forInsertData = {
+      ...events,
+      ...data,
+      detail_page_url: data.detail_page_url ? data.detail_page_url : null,
+      button_url: data.button_url ? data.button_url : null
+    };
+    return await getRepository(Events).save(forInsertData);
   },
 
   putEventService: async (data, id) => {
