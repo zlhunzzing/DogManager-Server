@@ -6,6 +6,7 @@ import adminRouter from "./routes/admin";
 import userRouter from "./routes/user";
 import cors from "cors";
 import { createTypeormConnection } from "./utils/createTypeormConnection";
+/////////////////////
 import AWS from "aws-sdk";
 import path from "path";
 import multer from "multer";
@@ -24,7 +25,7 @@ const upload = multer({
     acl: "public-read-write"
   })
 });
-
+////////////////////////////
 const app = express();
 const PORT: number = 3000;
 app.use(bodyParser.json());
@@ -35,11 +36,13 @@ if (process.env.NODE_ENV !== "test") {
 }
 app.use("/api/user", userRouter);
 app.use("/api/admin", adminRouter);
+//////////////////////////////////////////////////////
 app.post("/upload", upload.single("imgFile"), (req, res, next) => {
   const imgFile = req.file;
   console.log(imgFile);
   res.json(imgFile);
 });
+////////////////////////////////////////////////
 
 // start express server
 app.listen(PORT, async () => {
