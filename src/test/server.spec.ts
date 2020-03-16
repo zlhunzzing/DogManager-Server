@@ -8,11 +8,11 @@ import { createTypeormConnection } from "../utils/createTypeormConnection";
 import { Events } from "../entity/Events";
 import { getRepository, getConnection } from "typeorm";
 
-const dataForCreateEvent = (num: number = 1) => {
+const dataForCreateEvent = (num: number = 1): object => {
   return {
     event_title: `new event ${num}`,
-    start_date: "2020-04-01",
-    end_date: "2020-04-30",
+    start_date: "202003161105",
+    end_date: "202004012359",
     detail_page_url: "detail page url",
     button_url: "button url",
     button_image: "button image",

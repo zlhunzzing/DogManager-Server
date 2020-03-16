@@ -2,8 +2,19 @@ import { getConnection } from "typeorm";
 import { getRepository } from "typeorm";
 import { Events } from "../entity/Events";
 
-export default {
-  addEventService: async data => {
+interface BodyType {
+  event_title: string;
+  start_date: string;
+  end_date: string;
+  detail_page_url: string;
+  button_url: string;
+  button_image: string;
+  banner_image: string;
+  page_image: string;
+}
+
+export default class AdminService {
+  async addEventService(data: BodyType): Promise<void> {
     const events = new Events();
     const forInsertData = {
       ...events,
@@ -11,10 +22,10 @@ export default {
       detail_page_url: data.detail_page_url ? data.detail_page_url : null,
       button_url: data.button_url ? data.button_url : null
     };
-    return await getRepository(Events).save(forInsertData);
-  },
+    await getRepository(Events).save(forInsertData);
+  }
 
-  putEventService: async (data, id) => {
+  async putEventService(data: BodyType, id: string): Promise<void> {
     const result = await getRepository(Events).findOne({
       where: {
         id
@@ -24,10 +35,10 @@ export default {
       ...result,
       ...data
     };
-    return await getRepository(Events).save(updatedResult);
-  },
+    await getRepository(Events).save(updatedResult);
+  }
 
-  getEventListService: async () => {
+  async getEventListService(): Promise<object> {
     const result = await getRepository(Events).find({
       select: [
         "id",
@@ -41,9 +52,9 @@ export default {
       }
     });
     return result;
-  },
+  }
 
-  getEventEntryService: async id => {
+  async getEventEntryService(id: string): Promise<object> {
     const result = await getRepository(Events).findOne({
       where: {
         id,
@@ -51,9 +62,9 @@ export default {
       }
     });
     return result;
-  },
+  }
 
-  deleteEventService: async id => {
+  async deleteEventService(id: string): Promise<void> {
     const result = await getRepository(Events).findOne({
       where: {
         id
@@ -62,4 +73,4 @@ export default {
     result.is_deleted = true;
     await getRepository(Events).save(result);
   }
-};
+}
