@@ -12,43 +12,43 @@ export class Events {
   id: number;
 
   @Column()
-  event_title: string;
+  eventTitle: string;
 
   @Column()
-  start_date: string;
+  startDate: string;
 
   @Column()
-  end_date: string;
+  endDate: string;
 
   @Column({
     nullable: true
   })
-  detail_page_url: string;
+  detailPageUrl: string;
 
   @Column({
     nullable: true
   })
-  button_url: string;
+  buttonUrl: string;
 
   @Column()
-  button_image: string;
+  buttonImage: string;
 
   @Column()
-  banner_image: string;
+  bannerImage: string;
 
   @Column()
-  page_image: string;
+  pageImage: string;
 
   @CreateDateColumn()
-  created_at: string;
+  createdAt: string;
 
   @UpdateDateColumn()
-  updated_at: string;
+  updatedAt: string;
 
   // type boolean으로 바꾸는거 논의해보기
   @Column({
     type: "boolean",
     default: false
   })
-  is_deleted: boolean;
+  isDeleted: boolean;
 }

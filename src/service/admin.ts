@@ -3,14 +3,14 @@ import { getRepository } from "typeorm";
 import { Events } from "../entity/Events";
 
 interface BodyType {
-  event_title: string;
-  start_date: string;
-  end_date: string;
-  detail_page_url: string;
-  button_url: string;
-  button_image: string;
-  banner_image: string;
-  page_image: string;
+  eventTitle: string;
+  startDate: string;
+  endDate: string;
+  detailPageUrl: string;
+  buttonUrl: string;
+  buttonImage: string;
+  bannerImage: string;
+  pageImage: string;
 }
 
 export default class AdminService {
@@ -19,8 +19,8 @@ export default class AdminService {
     const forInsertData = {
       ...events,
       ...data,
-      detail_page_url: data.detail_page_url ? data.detail_page_url : null,
-      button_url: data.button_url ? data.button_url : null
+      detail_page_url: data.detailPageUrl ? data.detailPageUrl : null,
+      button_url: data.buttonUrl ? data.buttonUrl : null
     };
     await getRepository(Events).save(forInsertData);
   }
@@ -40,15 +40,9 @@ export default class AdminService {
 
   async getEventListService(): Promise<object> {
     const result = await getRepository(Events).find({
-      select: [
-        "id",
-        "event_title",
-        "start_date",
-        "end_date",
-        "detail_page_url"
-      ],
+      select: ["id", "eventTitle", "startDate", "endDate", "detailPageUrl"],
       where: {
-        is_deleted: false
+        isDeleted: false
       }
     });
     return result;
@@ -58,7 +52,7 @@ export default class AdminService {
     const result = await getRepository(Events).findOne({
       where: {
         id,
-        is_deleted: false
+        isDeleted: false
       }
     });
     return result;
@@ -70,7 +64,7 @@ export default class AdminService {
         id
       }
     });
-    result.is_deleted = true;
+    result.isDeleted = true;
     await getRepository(Events).save(result);
   }
 }
