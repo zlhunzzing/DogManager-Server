@@ -19,8 +19,8 @@ export default class AdminService {
     const forInsertData = {
       ...events,
       ...data,
-      detail_page_url: data.detailPageUrl ? data.detailPageUrl : null,
-      button_url: data.buttonUrl ? data.buttonUrl : null
+      detailPage_url: data.detailPageUrl ? data.detailPageUrl : null,
+      buttonUrl: data.buttonUrl ? data.buttonUrl : null
     };
     await getRepository(Events).save(forInsertData);
   }
