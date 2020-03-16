@@ -6,13 +6,7 @@ import { Request, Response } from "express";
 export default {
   getEventListController: async (req: Request, res: Response) => {
     const result = await getRepository(Events).find({
-      select: [
-        "id",
-        "event_title",
-        "start_date",
-        "end_date",
-        "detail_page_url"
-      ],
+      select: ["id", "eventTitle", "startDate", "endDate", "detailPageUrl"],
       where: {
         is_deleted: false
       }

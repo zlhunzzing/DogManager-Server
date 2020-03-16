@@ -10,14 +10,14 @@ import { getRepository, getConnection } from "typeorm";
 
 const dataForCreateEvent = (num: number = 1): object => {
   return {
-    event_title: `new event ${num}`,
-    start_date: "202003161105",
-    end_date: "202004012359",
-    detail_page_url: "detail page url",
-    button_url: "button url",
-    button_image: "button image",
-    banner_image: "banner image",
-    page_image: "page image"
+    eventTitle: `new event ${num}`,
+    startDate: "202003161105",
+    endDate: "202004012359",
+    detailPageUrl: "detail page url",
+    buttonUrl: "button url",
+    buttonImage: "button image",
+    bannerImage: "banner image",
+    pageImage: "page image"
   };
 };
 
@@ -61,10 +61,10 @@ describe("Implemented testcase", () => {
           expect(res.body.eventList.length).to.equal(2);
           expect(res.body.eventList[0]).has.all.keys([
             "id",
-            "event_title",
-            "start_date",
-            "end_date",
-            "detail_page_url"
+            "eventTitle",
+            "startDate",
+            "endDate",
+            "detailPageUrl"
           ]);
           done();
         });
@@ -76,18 +76,18 @@ describe("Implemented testcase", () => {
           if (err) done(err);
           expect(res).to.have.status(200);
           expect(res.body).has.all.keys([
-            "event_title",
-            "start_date",
-            "end_date",
-            "detail_page_url",
-            "button_url",
-            "button_image",
-            "banner_image",
-            "page_image",
+            "eventTitle",
+            "startDate",
+            "endDate",
+            "detailPageUrl",
+            "buttonUrl",
+            "buttonImage",
+            "bannerImage",
+            "pageImage",
             "id",
-            "created_at",
-            "updated_at",
-            "is_deleted"
+            "createdAt",
+            "updatedAt",
+            "isDeleted"
           ]);
           done();
         });
@@ -104,7 +104,7 @@ describe("Implemented testcase", () => {
             agent.get("/api/admin/events/entry/1").end((err, res) => {
               if (err) done(err);
               expect(res).to.have.status(200);
-              expect(res.body.event_title).to.equal("new event 2");
+              expect(res.body.eventTitle).to.equal("new event 2");
               done();
             });
           });
