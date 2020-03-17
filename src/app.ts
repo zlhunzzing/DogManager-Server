@@ -4,6 +4,7 @@ import adminRouter from "./routes/admin";
 import userRouter from "./routes/user";
 import cors from "cors";
 import { createTypeormConnection } from "./utils/createTypeormConnection";
+import morgan from "morgan";
 
 const app = express();
 const PORT: number = 3002;
@@ -19,6 +20,7 @@ app.use(
     credentials: true
   })
 );
+app.use(morgan("dev"));
 
 if (process.env.NODE_ENV !== "test") {
   createTypeormConnection();
