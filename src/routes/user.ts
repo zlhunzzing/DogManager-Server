@@ -5,6 +5,6 @@ const router = express.Router({ strict: true });
 
 router.get("/events/list", userController.getEventListController);
 
-router.get("/events/entry/:id", userController.getEventEntryController);
+router.get("/events/entry/:url", userController.getEventEntryController);
 
 export default router;

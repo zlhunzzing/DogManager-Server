@@ -14,7 +14,23 @@ interface BodyType {
 }
 
 export default class AdminService {
-  async addEventService(data: BodyType): Promise<void> {
+  async addEventService(data: BodyType): Promise<object> {
+    const indata = await getRepository(Events).findOne({
+      where: [
+        {
+          detailPageUrl: data.detailPageUrl
+        },
+        { buttonUrl: data.buttonUrl }
+      ]
+    });
+    if (indata) {
+      if (indata.detailPageUrl === data.detailPageUrl) {
+        return { key: "detailPageUrl" };
+      } else if (indata.buttonUrl === data.buttonUrl) {
+        return { key: "buttonUrl" };
+      }
+    }
+
     const events = new Events();
     const forInsertData = {
       ...events,
@@ -23,6 +39,7 @@ export default class AdminService {
       buttonUrl: data.buttonUrl ? data.buttonUrl : null
     };
     await getRepository(Events).save(forInsertData);
+    return { key: "completed" };
   }
 
   async putEventService(data: BodyType, id: string): Promise<void> {
@@ -43,7 +60,14 @@ export default class AdminService {
 
   async getEventListService(): Promise<object> {
     const result = await getRepository(Events).find({
-      select: ["id", "eventTitle", "startDate", "endDate", "detailPageUrl"],
+      select: [
+        "id",
+        "eventTitle",
+        "startDate",
+        "endDate",
+        "detailPageUrl",
+        "bannerImage"
+      ],
       where: {
         isDeleted: false
       }
