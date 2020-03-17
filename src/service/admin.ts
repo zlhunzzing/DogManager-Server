@@ -19,7 +19,7 @@ export default class AdminService {
     const forInsertData = {
       ...events,
       ...data,
-      detailPage_url: data.detailPageUrl ? data.detailPageUrl : null,
+      detailPageUrl: data.detailPageUrl ? data.detailPageUrl : null,
       buttonUrl: data.buttonUrl ? data.buttonUrl : null
     };
     await getRepository(Events).save(forInsertData);
@@ -33,7 +33,10 @@ export default class AdminService {
     });
     const updatedResult = {
       ...result,
-      ...data
+      ...data,
+      buttonImage: data.buttonImage ? data.buttonImage : result.buttonImage,
+      bannerImage: data.bannerImage ? data.bannerImage : result.bannerImage,
+      pageImage: data.pageImage ? data.pageImage : result.pageImage
     };
     await getRepository(Events).save(updatedResult);
   }

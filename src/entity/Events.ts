@@ -17,7 +17,9 @@ export class Events {
   @Column()
   startDate: string;
 
-  @Column()
+  @Column({
+    nullable: true
+  })
   endDate: string;
 
   @Column({
