@@ -5,12 +5,26 @@ const service = new adminService();
 
 export default {
   addEventController: async (req: Request, res: Response): Promise<void> => {
-    await service.addEventService(req.body);
+    const data = req.body;
+    data.pageImage = req.files["pageImage"][0].location;
+    data.bannerImage = req.files["bannerImage"][0].location;
+    data.buttonImage = req.files["buttonImage"][0].location;
+    await service.addEventService(data);
     res.status(201).end();
   },
 
   putEventController: async (req: Request, res: Response): Promise<void> => {
-    await service.putEventService(req.body, req.params.id);
+    const data = req.body;
+    if (req.files["pageImage"]) {
+      data.pageImage = req.files["pageImage"][0].location;
+    }
+    if (req.files["bannerImage"]) {
+      data.bannerImage = req.files["bannerImage"][0].location;
+    }
+    if (req.files["buttonImage"]) {
+      data.buttonImage = req.files["buttonImage"][0].location;
+    }
+    await service.putEventService(data, req.params.id);
     res.status(200).end();
   },
 
