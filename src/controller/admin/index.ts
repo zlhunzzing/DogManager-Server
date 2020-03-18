@@ -19,9 +19,11 @@ export default {
     res: Response
   ): Promise<void> => {
     const data = req.body;
-    data.pageImage = req.files["pageImage"][0].location;
-    data.bannerImage = req.files["bannerImage"][0].location;
-    data.buttonImage = req.files["buttonImage"][0].location;
+    if (req.files["pageImage"]) {
+      data.pageImage = req.files["pageImage"][0].location;
+      data.bannerImage = req.files["bannerImage"][0].location;
+      data.buttonImage = req.files["buttonImage"][0].location;
+    }
     const result = await service.addEventService(data);
     if (result["key"] === "detailPageUrl") {
       res.status(409).send("detailPageUrl");
