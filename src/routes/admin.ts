@@ -18,7 +18,8 @@ const upload = multer({
       const extension = path.extname(file.originalname);
       cb(null, Date.now().toString() + extension);
     },
-    acl: "public-read-write"
+    acl: "public-read-write",
+    limits: { fileSize: 5 * 1024 * 1024 }
   })
   // dest: "../uploads"
 });
