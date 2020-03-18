@@ -25,7 +25,7 @@ app.use(body_parser_1.default.json());
 // app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors_1.default({
     origin: [
-        // 클라이언트 s3 엔드포인트 : 'http://my-type.s3-website.ap-northeast-2.amazonaws.com',
+        "http://dogandcodemate.s3-website.ap-northeast-2.amazonaws.com",
         "http://localhost:3000"
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
