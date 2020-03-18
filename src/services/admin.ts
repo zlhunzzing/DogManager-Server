@@ -30,7 +30,6 @@ export default class AdminService {
         return { key: "buttonUrl" };
       }
     }
-
     const events = new Events();
     const forInsertData = {
       ...events,

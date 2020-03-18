@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
-import adminService from "../../service/admin";
+import adminService from "../../services/admin";
+import { Events } from "../../entity/Events";
+import { getRepository } from "typeorm";
 
 const service = new adminService();
 
@@ -28,7 +30,6 @@ export default {
     } else {
       res.status(201).end();
     }
-    // res.status(201).end();
   },
 
   putEventController: async (
