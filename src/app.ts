@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 app.use(
   cors({
     origin: [
-      // 클라이언트 s3 엔드포인트 : 'http://my-type.s3-website.ap-northeast-2.amazonaws.com',
+      "http://dogandcodemate.s3-website.ap-northeast-2.amazonaws.com/",
       "http://localhost:3000"
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
