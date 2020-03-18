@@ -3,7 +3,7 @@ import { Events } from "../../entity/Events";
 import { getRepository } from "typeorm";
 import { Request, Response } from "express";
 
-import UserService from "../../service/user";
+import UserService from "../../services/user";
 const service = new UserService();
 
 export default {
