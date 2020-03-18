@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 app.use(
   cors({
     origin: [
-      "http://dogandcodemate.s3-website.ap-northeast-2.amazonaws.com/",
+      "http://dogandcodemate.s3-website.ap-northeast-2.amazonaws.com",
       "http://localhost:3000"
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],

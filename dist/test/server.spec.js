@@ -8,23 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const chai = __importStar(require("chai"));
+const chai_1 = __importDefault(require("chai"));
 require("mocha");
 const chaiHttp = require("chai-http");
 const app_1 = __importDefault(require("../app"));
-chai.use(chaiHttp);
-const expect = chai.expect;
+chai_1.default.use(chaiHttp);
+const expect = chai_1.default.expect;
 const createTypeormConnection_1 = require("../utils/createTypeormConnection");
 const Events_1 = require("../entity/Events");
 const typeorm_1 = require("typeorm");
@@ -50,7 +43,7 @@ describe("Implemented testcase", () => {
     }));
     describe("POST Method", () => {
         it("should create a new event", done => {
-            const agent = chai.request.agent(app_1.default);
+            const agent = chai_1.default.request.agent(app_1.default);
             agent
                 .post("/api/admin/events/entry")
                 .send(dataForCreateEvent())
@@ -73,7 +66,7 @@ describe("Implemented testcase", () => {
         });
         describe("GET Method", () => {
             it("should get all event lists", done => {
-                const agent = chai.request.agent(app_1.default);
+                const agent = chai_1.default.request.agent(app_1.default);
                 agent.get("/api/admin/events/list").end((err, res) => {
                     if (err)
                         done(err);
@@ -90,7 +83,7 @@ describe("Implemented testcase", () => {
                 });
             });
             it("should get information of selected event", done => {
-                const agent = chai.request.agent(app_1.default);
+                const agent = chai_1.default.request.agent(app_1.default);
                 agent.get("/api/admin/events/entry/1").end((err, res) => {
                     if (err)
                         done(err);
@@ -115,7 +108,7 @@ describe("Implemented testcase", () => {
         });
         describe("PUT Method", () => {
             it("should edit a information of event", done => {
-                const agent = chai.request.agent(app_1.default);
+                const agent = chai_1.default.request.agent(app_1.default);
                 agent
                     .put("/api/admin/events/entry/1")
                     .send(dataForCreateEvent(2))
@@ -132,7 +125,7 @@ describe("Implemented testcase", () => {
         });
         describe("DELETE Method", () => {
             it("should delete event", done => {
-                const agent = chai.request.agent(app_1.default);
+                const agent = chai_1.default.request.agent(app_1.default);
                 agent.delete("/api/admin/events/entry/1").then(() => {
                     agent.get("/api/admin/events/list").end((err, res) => {
                         if (err)
