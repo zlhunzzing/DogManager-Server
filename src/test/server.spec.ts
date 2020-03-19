@@ -35,8 +35,16 @@ describe("Implemented testcase", () => {
       const agent = chai.request.agent(app);
       agent
         .post("/api/admin/events/entry")
-        .set("content-type", "multipart/form-data")
-        .send(dataForCreateEvent())
+        .field("eventTitle", "new event 1")
+        .field("startDate", "202003161105")
+        .field("endDate", "202004012359")
+        .field("detailPageUrl", "detail page url")
+        .field("buttonUrl", "button url")
+        .field("buttonImage", "button image")
+        .field("bannerImage", "banner image")
+        .field("pageImage", "page image")
+        // .set("content-type", "multipart/form-data")
+        // .send(dataForCreateEvent())
         .end((err, res) => {
           if (err) done(err);
           expect(res).to.have.status(201);
@@ -100,8 +108,14 @@ describe("Implemented testcase", () => {
         const agent = chai.request.agent(app);
         agent
           .put("/api/admin/events/entry/1")
-          .set("content-type", "multipart/form-data")
-          .send(dataForCreateEvent(2))
+          .field("eventTitle", "new event 2")
+          .field("startDate", "202003161105")
+          .field("endDate", "202004012359")
+          .field("detailPageUrl", "detail page url")
+          .field("buttonUrl", "button url")
+          .field("buttonImage", "button image")
+          .field("bannerImage", "banner image")
+          .field("pageImage", "page image")
           .then(() => {
             agent.get("/api/admin/events/entry/1").end((err, res) => {
               if (err) done(err);

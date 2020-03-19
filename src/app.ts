@@ -20,10 +20,11 @@ app.use(
     credentials: true
   })
 );
-app.use(morgan("dev"));
+// app.use(morgan("dev"));
 
 if (process.env.NODE_ENV !== "test") {
   createTypeormConnection();
+  app.use(morgan("dev"));
 }
 app.use("/api/user", userRouter);
 app.use("/api/admin", adminRouter);
