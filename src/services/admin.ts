@@ -7,7 +7,7 @@ interface BodyType {
   startDate: string;
   endDate: string;
   detailPageUrl: string;
-  buttonUrl: string;
+  couponCode: string;
   buttonImage: string;
   bannerImage: string;
   pageImage: string;
@@ -19,15 +19,12 @@ export default class AdminService {
       where: [
         {
           detailPageUrl: data.detailPageUrl
-        },
-        { buttonUrl: data.buttonUrl }
+        }
       ]
     });
     if (indata) {
       if (indata.detailPageUrl === data.detailPageUrl) {
         return { key: "detailPageUrl" };
-      } else if (indata.buttonUrl === data.buttonUrl) {
-        return { key: "buttonUrl" };
       }
     }
     const events = new Events();
@@ -35,26 +32,39 @@ export default class AdminService {
       ...events,
       ...data,
       detailPageUrl: data.detailPageUrl ? data.detailPageUrl : null,
-      buttonUrl: data.buttonUrl ? data.buttonUrl : null
+      couponCode: data.couponCode ? data.couponCode : null
     };
     await getRepository(Events).save(forInsertData);
     return { key: "completed" };
   }
 
-  async putEventService(data: BodyType, id: string): Promise<void> {
+  async putEventService(data: BodyType, id: string): Promise<object> {
     const result = await getRepository(Events).findOne({
       where: {
         id
       }
     });
-    const updatedResult = {
+    if (result.detailPageUrl !== data.detailPageUrl) {
+      const indata = await getRepository(Events).findOne({
+        where: {
+          detailPageUrl: data.detailPageUrl
+        }
+      });
+      if (indata) {
+        if (indata.detailPageUrl === data.detailPageUrl) {
+          return { key: "detailPageUrl" };
+        }
+      }
+    }
+    const updatedResult2 = {
       ...result,
       ...data,
       buttonImage: data.buttonImage ? data.buttonImage : result.buttonImage,
       bannerImage: data.bannerImage ? data.bannerImage : result.bannerImage,
       pageImage: data.pageImage ? data.pageImage : result.pageImage
     };
-    await getRepository(Events).save(updatedResult);
+    await getRepository(Events).save(updatedResult2);
+    return { key: "completed" };
   }
 
   async getEventListService(): Promise<object> {

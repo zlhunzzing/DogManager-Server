@@ -28,7 +28,8 @@ const upload = multer_1.default({
             const extension = path_1.default.extname(file.originalname);
             cb(null, Date.now().toString() + extension);
         },
-        acl: "public-read-write"
+        acl: "public-read-write",
+        limits: { fileSize: 5 * 1024 * 1024 }
     })
     // dest: "../uploads"
 });
@@ -40,7 +41,7 @@ const option = [
     { name: "bannerImage", maxCount: 5 },
     { name: "buttonImage", maxCount: 5 },
     { name: "detailPageUrl", maxCount: 5 },
-    { name: "buttonUrl", maxCount: 5 }
+    { name: "couponCode", maxCount: 5 }
 ];
 router.post("/events/entry", upload.fields(option), adminController.addEventController);
 router.get("/events/list", adminController.getEventListController);

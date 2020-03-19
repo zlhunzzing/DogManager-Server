@@ -5,7 +5,8 @@
   "rules": {
     "semicolon": true,
     "no-console": false,
-    "no-string-literal": false
+    "no-string-literal": false,
+    "prefer-for-of": false
   },
   "rulesDirectory": []
 }

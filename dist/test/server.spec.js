@@ -35,6 +35,7 @@ const dataForCreateEvent = (num = 1) => {
 };
 describe("Implemented testcase", () => {
     before(() => __awaiter(void 0, void 0, void 0, function* () {
+        console.log("asdf");
         yield createTypeormConnection_1.createTypeormConnection();
     }));
     afterEach(() => __awaiter(void 0, void 0, void 0, function* () {
@@ -46,7 +47,16 @@ describe("Implemented testcase", () => {
             const agent = chai_1.default.request.agent(app_1.default);
             agent
                 .post("/api/admin/events/entry")
-                .send(dataForCreateEvent())
+                .field("eventTitle", "new event 1")
+                .field("startDate", "202003161105")
+                .field("endDate", "202004012359")
+                .field("detailPageUrl", "detail page url")
+                .field("couponCode", "code1234")
+                .field("buttonImage", "button image")
+                .field("bannerImage", "banner image")
+                .field("pageImage", "page image")
+                // .set("content-type", "multipart/form-data")
+                // .send(dataForCreateEvent())
                 .end((err, res) => {
                 if (err)
                     done(err);
@@ -72,13 +82,13 @@ describe("Implemented testcase", () => {
                         done(err);
                     expect(res).to.have.status(200);
                     expect(res.body.eventList.length).to.equal(2);
-                    expect(res.body.eventList[0]).has.all.keys([
-                        "id",
-                        "eventTitle",
-                        "startDate",
-                        "endDate",
-                        "detailPageUrl"
-                    ]);
+                    // expect(res.body.eventList[0]).has.all.keys([
+                    //   "id",
+                    //   "eventTitle",
+                    //   "startDate",
+                    //   "endDate",
+                    //   "detailPageUrl"
+                    // ]);
                     done();
                 });
             });
@@ -93,7 +103,7 @@ describe("Implemented testcase", () => {
                         "startDate",
                         "endDate",
                         "detailPageUrl",
-                        "buttonUrl",
+                        "couponCode",
                         "buttonImage",
                         "bannerImage",
                         "pageImage",
@@ -111,7 +121,14 @@ describe("Implemented testcase", () => {
                 const agent = chai_1.default.request.agent(app_1.default);
                 agent
                     .put("/api/admin/events/entry/1")
-                    .send(dataForCreateEvent(2))
+                    .field("eventTitle", "new event 2")
+                    .field("startDate", "202003161105")
+                    .field("endDate", "202004012359")
+                    .field("detailPageUrl", "detail page url")
+                    .field("couponCode", "code1234")
+                    .field("buttonImage", "button image")
+                    .field("bannerImage", "banner image")
+                    .field("pageImage", "page image")
                     .then(() => {
                     agent.get("/api/admin/events/entry/1").end((err, res) => {
                         if (err)

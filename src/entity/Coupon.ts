@@ -1,22 +1,19 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export class User {
+export class Coupon {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  name: string;
+  couponName: string;
 
   @Column()
-  email: string;
+  couponCode: string;
 
   @Column()
-  password: string;
+  description: string;
 
   @Column()
-  mobile: string;
-
-  @Column()
-  address: string;
+  period: number;
 }

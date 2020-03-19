@@ -27,8 +27,6 @@ export default {
     const result = await service.addEventService(data);
     if (result["key"] === "detailPageUrl") {
       res.status(409).send("detailPageUrl");
-    } else if (result["key"] === "buttonUrl") {
-      res.status(409).send("buttonUrl");
     } else {
       res.status(201).end();
     }
@@ -48,8 +46,12 @@ export default {
     if (req.files["buttonImage"]) {
       data.buttonImage = req.files["buttonImage"][0].location;
     }
-    await service.putEventService(data, req.params.id);
-    res.status(200).end();
+    const result = await service.putEventService(data, req.params.id);
+    if (result["key"] === "detailPageUrl") {
+      res.status(409).send("detailPageUrl");
+    } else {
+      res.status(200).end();
+    }
   },
 
   getEventListController: async (
