@@ -39,7 +39,7 @@ describe("Implemented testcase", () => {
         .field("startDate", "202003161105")
         .field("endDate", "202004012359")
         .field("detailPageUrl", "detail page url")
-        .field("buttonUrl", "button url")
+        .field("couponCode", "code1234")
         .field("buttonImage", "button image")
         .field("bannerImage", "banner image")
         .field("pageImage", "page image")
@@ -89,7 +89,7 @@ describe("Implemented testcase", () => {
             "startDate",
             "endDate",
             "detailPageUrl",
-            "buttonUrl",
+            "couponCode",
             "buttonImage",
             "bannerImage",
             "pageImage",
@@ -112,7 +112,7 @@ describe("Implemented testcase", () => {
           .field("startDate", "202003161105")
           .field("endDate", "202004012359")
           .field("detailPageUrl", "detail page url")
-          .field("buttonUrl", "button url")
+          .field("couponCode", "code1234")
           .field("buttonImage", "button image")
           .field("bannerImage", "banner image")
           .field("pageImage", "page image")
@@ -121,6 +121,7 @@ describe("Implemented testcase", () => {
               if (err) done(err);
               expect(res).to.have.status(200);
               expect(res.body.eventTitle).to.equal("new event 2");
+              // expect(res.body.deta).to.equal("new event 2");
               done();
             });
           });

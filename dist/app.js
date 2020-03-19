@@ -31,9 +31,10 @@ app.use(cors_1.default({
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
 }));
-app.use(morgan_1.default("dev"));
+// app.use(morgan("dev"));
 if (process.env.NODE_ENV !== "test") {
     createTypeormConnection_1.createTypeormConnection();
+    app.use(morgan_1.default("dev"));
 }
 app.use("/api/user", user_1.default);
 app.use("/api/admin", admin_1.default);

@@ -37,12 +37,6 @@ __decorate([
     __metadata("design:type", String)
 ], Events.prototype, "detailPageUrl", void 0);
 __decorate([
-    typeorm_1.Column({
-        nullable: true
-    }),
-    __metadata("design:type", String)
-], Events.prototype, "buttonUrl", void 0);
-__decorate([
     typeorm_1.Column(),
     __metadata("design:type", String)
 ], Events.prototype, "buttonImage", void 0);
@@ -69,6 +63,12 @@ __decorate([
     }),
     __metadata("design:type", Boolean)
 ], Events.prototype, "isDeleted", void 0);
+__decorate([
+    typeorm_1.Column({
+        nullable: true
+    }),
+    __metadata("design:type", String)
+], Events.prototype, "couponCode", void 0);
 Events = __decorate([
     typeorm_1.Entity()
 ], Events);

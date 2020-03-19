@@ -27,11 +27,6 @@ export class Events {
   })
   detailPageUrl: string;
 
-  @Column({
-    nullable: true
-  })
-  buttonUrl: string;
-
   @Column()
   buttonImage: string;
 
@@ -53,4 +48,9 @@ export class Events {
     default: false
   })
   isDeleted: boolean;
+
+  @Column({
+    nullable: true
+  })
+  couponCode: string;
 }

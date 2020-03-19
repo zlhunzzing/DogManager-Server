@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha -r ts-node/register src/test/**/*.spec.ts --exit",
+    "test": "NODE_ENV=test mocha -r ts-node/register src/test/**/*.spec.ts --timeout 20000 --exit",
     "dev": "NODE_ENV=development nodemon src/app.ts",
     "start": "NODE_ENV=production nodemon dist/app.js"
   },

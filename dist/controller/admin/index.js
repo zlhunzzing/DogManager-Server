@@ -12,25 +12,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const admin_1 = __importDefault(require("../../service/admin"));
+const admin_1 = __importDefault(require("../../services/admin"));
 const service = new admin_1.default();
 exports.default = {
     addEventController: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const data = req.body;
-        data.pageImage = req.files["pageImage"][0].location;
-        data.bannerImage = req.files["bannerImage"][0].location;
-        data.buttonImage = req.files["buttonImage"][0].location;
+        if (req.files["pageImage"]) {
+            data.pageImage = req.files["pageImage"][0].location;
+            data.bannerImage = req.files["bannerImage"][0].location;
+            data.buttonImage = req.files["buttonImage"][0].location;
+        }
         const result = yield service.addEventService(data);
         if (result["key"] === "detailPageUrl") {
             res.status(409).send("detailPageUrl");
         }
-        else if (result["key"] === "buttonUrl") {
-            res.status(409).send("buttonUrl");
-        }
         else {
             res.status(201).end();
         }
-        // res.status(201).end();
     }),
     putEventController: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const data = req.body;

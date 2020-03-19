@@ -1,3 +1,4 @@
 node_modules
 awsconfig.json
 ormconfig.json
+dist
