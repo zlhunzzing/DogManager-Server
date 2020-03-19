@@ -53,4 +53,10 @@ router.put(
   adminController.putEventController
 );
 
+router.post("/coupon", adminController.createCouponController);
+
+router.get("/coupon/list", adminController.getCouponListController);
+
+router.post("/signin", adminController.signinController);
+
 export default router;
