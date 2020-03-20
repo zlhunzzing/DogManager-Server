@@ -1,4 +1,6 @@
 node_modules
 awsconfig.json
 ormconfig.json
+.env
 dist
+

@@ -1,3 +1,4 @@
+// import dotenv from 'dotenv'.config();
 import express from "express";
 import bodyParser from "body-parser";
 import adminRouter from "./routes/admin";

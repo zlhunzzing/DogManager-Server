@@ -7,9 +7,9 @@ router.get("/events/list", userController.getEventListController);
 
 router.get("/events/entry/:url", userController.getEventEntryController);
 
-// router.post("/signup", userController.signupController);
+router.post("/signup", userController.signupController);
 
-// router.post("/signin", userController.signinController);
+router.post("/signin", userController.signinController);
 
 // router.post("/coupon", userController.addCouponController);
 

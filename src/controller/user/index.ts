@@ -1,8 +1,9 @@
-import { getConnection } from "typeorm";
-import { Events } from "../../entity/Events";
-import { getRepository } from "typeorm";
+import dotenv from "dotenv";
+dotenv.config();
+// import { getConnection } from "typeorm";
+// import { Events } from "../../entity/Events";
+// import { getRepository } from "typeorm";
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
 import UserService from "../../services/user";
 const service = new UserService();
 
@@ -34,20 +35,11 @@ export default {
 
   signinController: async (req: Request, res: Response): Promise<void> => {
     const result = await service.signinService(req.body);
-    if (result["key"] === "fail") {
-      res.status(409).end();
+    console.log(process.env.JWT_SECRET_KEY);
+    if (result["key"] === "unvalid user") {
+      res.status(409).send("unvalid user");
     } else {
-      const token = jwt.sign(
-        {
-          id: result["key"]
-        },
-        "@secretKey",
-        {
-          expiresIn: "1h"
-        }
-      );
-      res.set("Authorization", token);
-      res.status(200).json({ id: result["key"] });
+      res.status(200).json({ token: result["key"] });
     }
   }
 };

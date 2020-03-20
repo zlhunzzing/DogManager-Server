@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import { getConnection } from "typeorm";
 import { getRepository } from "typeorm";
 import { Events } from "../entity/Events";
@@ -110,12 +112,13 @@ export default class AdminService {
 
   async signinService(data: BodyType): Promise<object> {
     const { email, password } = data;
+    console.log(process.env.JWT_SECRET_KEY);
 
     const token = jwt.sign(
       {
         email
       },
-      "secret",
+      process.env.JWT_SECRET_KEY,
       {
         expiresIn: "5m"
       }
@@ -127,7 +130,7 @@ export default class AdminService {
       }
     });
     if (result) {
-      return { id: token };
+      return { key: token };
     } else {
       return { key: "unvalid user" };
     }
