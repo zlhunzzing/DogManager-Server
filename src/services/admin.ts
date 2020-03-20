@@ -1,6 +1,7 @@
 import { getConnection } from "typeorm";
 import { getRepository } from "typeorm";
 import { Events } from "../entity/Events";
+const jwt = require("jsonwebtoken");
 
 interface BodyType {
   eventTitle: string;
@@ -11,6 +12,8 @@ interface BodyType {
   buttonImage: string;
   bannerImage: string;
   pageImage: string;
+  email: string;
+  password: string;
 }
 
 export default class AdminService {
@@ -102,5 +105,31 @@ export default class AdminService {
     });
     result.isDeleted = true;
     await getRepository(Events).save(result);
+  }
+
+  async signinService(data: BodyType): Promise<object> {
+    const { email, password } = data;
+
+    let token = jwt.sign(
+      {
+        email: email
+      },
+      "secret",
+      {
+        expiresIn: "5m"
+      }
+    );
+
+    const result = await getRepository(Events).findOne({
+      where: {
+        email,
+        password
+      }
+    });
+    if (result) {
+      return { id: token };
+    } else {
+      return { key: "unvalid user" };
+    }
   }
 }
