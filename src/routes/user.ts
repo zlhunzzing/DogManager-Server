@@ -11,8 +11,8 @@ router.post("/signup", userController.signupController);
 
 router.post("/signin", userController.signinController);
 
-router.post("/coupon", userController.addCouponController);
+// router.post("/coupon", userController.addCouponController);
 
-router.get("/coupon/list", userController.getCouponListController);
+// router.get("/coupon/list", userController.getCouponListController);
 
 export default router;

@@ -1,5 +1,20 @@
 import { getRepository } from "typeorm";
 import { Events } from "../entity/Events";
+import { User } from "../entity/User";
+import crypto from "crypto";
+
+interface SignupData {
+  name: string;
+  email: string;
+  password: string;
+  mobile: string;
+  address: string;
+}
+
+interface SigninData {
+  email: string;
+  password: string;
+}
 
 export default class UserService {
   async getEventListService(): Promise<object> {
@@ -27,5 +42,43 @@ export default class UserService {
       }
     });
     return result;
+  }
+
+  async signupService(data: SignupData): Promise<object> {
+    const result = await getRepository(User).findOne({
+      where: {
+        email: data.email
+      }
+    });
+    if (result) {
+      return { key: "already exist" };
+    }
+    const shasum = crypto.createHmac("sha512", "@thisissecretkey");
+    shasum.update(data.password);
+    data.password = shasum.digest("hex");
+    const user = new User();
+    const forInsertData = {
+      ...user,
+      ...data
+    };
+    await getRepository(User).save(forInsertData);
+    return { key: "completed" };
+  }
+
+  async signinService(data: SigninData): Promise<object> {
+    const shasum = crypto.createHmac("sha512", "@thisissecretkey");
+    shasum.update(data.password);
+    data.password = shasum.digest("hex");
+    const result = await getRepository(User).findOne({
+      where: {
+        email: data.email,
+        password: data.password
+      }
+    });
+    if (result) {
+      return { key: result.id };
+    } else {
+      return { key: "fail" };
+    }
   }
 }
