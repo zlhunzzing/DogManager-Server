@@ -2,6 +2,7 @@ import { getRepository } from "typeorm";
 import { Events } from "../entity/Events";
 import { User } from "../entity/User";
 import crypto from "crypto";
+import jwt from "jsonwebtoken";
 
 interface SignupData {
   name: string;
@@ -76,9 +77,20 @@ export default class UserService {
       }
     });
     if (result) {
-      return { key: result.id };
+      const token = jwt.sign(
+        {
+          id: result.id,
+          email: result.email,
+          name: result.name
+        },
+        process.env.JWT_SECRET_KEY,
+        {
+          expiresIn: "1h"
+        }
+      );
+      return { key: token };
     } else {
-      return { key: "fail" };
+      return { key: "unvalid user" };
     }
   }
 }
