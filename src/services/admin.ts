@@ -1,7 +1,8 @@
 import { getConnection } from "typeorm";
 import { getRepository } from "typeorm";
 import { Events } from "../entity/Events";
-const jwt = require("jsonwebtoken");
+import { Admin } from "../entity/Admin";
+import jwt from "jsonwebtoken";
 
 interface BodyType {
   eventTitle: string;
@@ -110,17 +111,16 @@ export default class AdminService {
   async signinService(data: BodyType): Promise<object> {
     const { email, password } = data;
 
-    let token = jwt.sign(
+    const token = jwt.sign(
       {
-        email: email
+        email
       },
       "secret",
       {
         expiresIn: "5m"
       }
     );
-
-    const result = await getRepository(Events).findOne({
+    const result = await getRepository(Admin).findOne({
       where: {
         email,
         password

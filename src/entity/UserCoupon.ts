@@ -1,4 +1,16 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn
+} from "typeorm";
+
+// enum couponState {
+//   enable,
+//   disable,
+//   canceld
+// }
 
 @Entity()
 export class UserCoupon {
@@ -14,9 +26,12 @@ export class UserCoupon {
   @Column()
   expiredAt: string;
 
-  @Column({
-    type: "boolean",
-    default: false
-  })
-  isDeleted: boolean;
+  @Column()
+  isDeleted: number;
+
+  @CreateDateColumn()
+  createdAt: string;
+
+  @UpdateDateColumn()
+  updatedAt: string;
 }

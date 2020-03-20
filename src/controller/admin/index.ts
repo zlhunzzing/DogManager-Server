@@ -76,9 +76,10 @@ export default {
   },
 
   signinController: async (req: Request, res: Response): Promise<void> => {
+    // console.log("여기!!!!!!!!!!!!!", req.body);
     const result = await service.signinService(req.body);
     if (result["id"]) {
-      res.status(200).json(result["id"]);
+      res.status(200).json({ token: result["id"] });
     } else {
       res.status(409).send("unvaild user");
     }
