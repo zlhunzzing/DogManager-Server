@@ -23,6 +23,9 @@ export class Coupon {
   @Column()
   period: number;
 
+  @Column()
+  discount: string;
+
   @CreateDateColumn()
   createdAt: string;
 

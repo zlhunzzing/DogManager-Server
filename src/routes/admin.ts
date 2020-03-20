@@ -7,7 +7,7 @@ import AWS from "aws-sdk";
 import path from "path";
 import multer from "multer";
 import multerS3 from "multer-s3";
-AWS.config.loadFromPath(__dirname + "/../../config/awsconfig.json");
+AWS.config.loadFromPath(__dirname + "/../../awsconfig.json");
 
 const s3 = new AWS.S3();
 const upload = multer({
@@ -57,6 +57,6 @@ router.put(
 
 // router.get("/coupon/list", adminController.getCouponListController);
 
-// router.post("/signin", adminController.signinController);
+router.post("/signin", adminController.signinController);
 
 export default router;

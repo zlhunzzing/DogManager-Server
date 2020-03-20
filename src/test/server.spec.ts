@@ -6,6 +6,7 @@ chai.use(chaiHttp);
 const expect = chai.expect;
 import { createTypeormConnection } from "../utils/createTypeormConnection";
 import { Events } from "../entity/Events";
+import { Admin } from "../entity/Admin";
 import { getRepository, getConnection } from "typeorm";
 
 const dataForCreateEvent = (num: number = 1): object => {
@@ -139,6 +140,37 @@ describe("Implemented testcase", () => {
             done();
           });
         });
+      });
+    });
+  });
+
+  describe("Login API test", () => {
+    describe("Admin login test", () => {
+      beforeEach(async () => {
+        const adminData = {
+          email: "admin@dogmate.com",
+          password: "1234"
+        };
+        await getRepository(Admin).save(adminData);
+      });
+      afterEach(async () => {
+        const repository = await getRepository(Admin);
+        await repository.query(`TRUNCATE TABLE admin;`);
+      });
+      it("should login with admin's ID", done => {
+        const agent = chai.request.agent(app);
+        agent
+          .post("/api/admin/signin")
+          .send({
+            email: "admin@dogmate.com",
+            password: "1234"
+          })
+          .end((err, res) => {
+            if (err) done(err);
+            expect(res).to.have.status(200);
+            expect(res.body).has.all.keys(["token"]);
+            done();
+          });
       });
     });
   });
