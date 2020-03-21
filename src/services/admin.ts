@@ -99,13 +99,26 @@ export default class AdminService {
     return result;
   }
 
-  async getEventEntryService(id: string): Promise<object> {
-    const result = await getRepository(Events).findOne({
+  async getEventEntryService(id: string, couponCode: string): Promise<object> {
+    const eventInfo = await getRepository(Events).findOne({
       where: {
         id,
         isDeleted: false
       }
     });
+    const couponInfo = await getRepository(Coupon).findOne({
+      where: {
+        couponCode
+      }
+    });
+    const couponListInfo = await getRepository(Coupon).find({
+      select: ["couponName", "couponCode"]
+    });
+    const result = {
+      ...eventInfo,
+      couponName: couponInfo.couponName,
+      couponList: couponListInfo
+    };
     return result;
   }
 

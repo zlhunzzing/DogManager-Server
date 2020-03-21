@@ -3,6 +3,7 @@ dotenv.config();
 import { getRepository } from "typeorm";
 import { Events } from "../entity/Events";
 import { User } from "../entity/User";
+import { Coupon } from "../entity/Coupon";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 
@@ -38,12 +39,21 @@ export default class UserService {
   }
 
   async getEventEntryService(url: string): Promise<object> {
-    const result = await getRepository(Events).findOne({
+    const eventInfo = await getRepository(Events).findOne({
       where: {
         detailPageUrl: `/${url}`,
         isDeleted: false
       }
     });
+    const couponInfo = await getRepository(Coupon).findOne({
+      where: {
+        couponCode: eventInfo.couponCode
+      }
+    });
+    const result = {
+      ...eventInfo,
+      period: couponInfo.period
+    };
     return result;
   }
 

@@ -91,7 +91,10 @@ export default {
     jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, decoded) => {
       if (err) return res.status(401).end();
       if (decoded) {
-        const result = await service.getEventEntryService(req.params.id);
+        const result = await service.getEventEntryService(
+          req.params.id,
+          req.body.couponCode
+        );
         res.status(200).json(result);
       }
     });
