@@ -4,9 +4,10 @@ import { getConnection } from "typeorm";
 import { getRepository } from "typeorm";
 import { Events } from "../entity/Events";
 import { Admin } from "../entity/Admin";
+import { Coupon } from "../entity/Coupon";
 import jwt from "jsonwebtoken";
 
-interface BodyType {
+interface EventData {
   eventTitle: string;
   startDate: string;
   endDate: string;
@@ -19,8 +20,16 @@ interface BodyType {
   password: string;
 }
 
+interface CouponData {
+  couponName: string;
+  couponCode: string;
+  description: string;
+  period: number;
+  discount: string;
+}
+
 export default class AdminService {
-  async addEventService(data: BodyType): Promise<object> {
+  async addEventService(data: EventData): Promise<object> {
     const indata = await getRepository(Events).findOne({
       where: [
         {
@@ -44,7 +53,7 @@ export default class AdminService {
     return { key: "completed" };
   }
 
-  async putEventService(data: BodyType, id: string): Promise<object> {
+  async putEventService(data: EventData, id: string): Promise<object> {
     const result = await getRepository(Events).findOne({
       where: {
         id
@@ -110,7 +119,7 @@ export default class AdminService {
     await getRepository(Events).save(result);
   }
 
-  async signinService(data: BodyType): Promise<object> {
+  async signinService(data: EventData): Promise<object> {
     const { email, password } = data;
 
     const result = await getRepository(Admin).findOne({
@@ -135,5 +144,9 @@ export default class AdminService {
     } else {
       return { key: "unvalid user" };
     }
+  }
+
+  async createCouponService(data: CouponData): Promise<void> {
+    await getRepository(Coupon).save(data);
   }
 }

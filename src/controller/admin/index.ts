@@ -115,5 +115,19 @@ export default {
     } else {
       res.status(409).send("unvaild user");
     }
+  },
+
+  createCouponController: async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    const token = req.headers.authorization;
+    jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, decoded) => {
+      if (err) return res.status(401).end();
+      if (decoded) {
+        await service.createCouponService(req.body);
+        res.status(201).end();
+      }
+    });
   }
 };
