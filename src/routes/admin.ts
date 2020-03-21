@@ -53,7 +53,7 @@ router.put(
   adminController.putEventController
 );
 
-// router.post("/coupon", adminController.createCouponController);
+router.post("/coupon", adminController.createCouponController);
 
 // router.get("/coupon/list", adminController.getCouponListController);
 

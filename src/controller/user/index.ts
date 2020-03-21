@@ -6,6 +6,7 @@ dotenv.config();
 import { Request, Response } from "express";
 import UserService from "../../services/user";
 const service = new UserService();
+import jwt from "jsonwebtoken";
 
 export default {
   getEventListController: async (
@@ -35,7 +36,6 @@ export default {
 
   signinController: async (req: Request, res: Response): Promise<void> => {
     const result = await service.signinService(req.body);
-    console.log(process.env.JWT_SECRET_KEY);
     if (result["key"] === "unvalid user") {
       res.status(409).send("unvalid user");
     } else {
