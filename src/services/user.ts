@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import { getRepository } from "typeorm";
 import { Events } from "../entity/Events";
 import { User } from "../entity/User";
@@ -80,8 +82,7 @@ export default class UserService {
       const token = jwt.sign(
         {
           id: result.id,
-          email: result.email,
-          name: result.name
+          email: result.email
         },
         process.env.JWT_SECRET_KEY,
         {

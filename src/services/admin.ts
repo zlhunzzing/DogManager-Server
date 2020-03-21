@@ -112,24 +112,25 @@ export default class AdminService {
 
   async signinService(data: BodyType): Promise<object> {
     const { email, password } = data;
-    console.log(process.env.JWT_SECRET_KEY);
 
-    const token = jwt.sign(
-      {
-        email
-      },
-      process.env.JWT_SECRET_KEY,
-      {
-        expiresIn: "5m"
-      }
-    );
     const result = await getRepository(Admin).findOne({
       where: {
         email,
         password
       }
     });
+
     if (result) {
+      const token = jwt.sign(
+        {
+          id: result.id,
+          email
+        },
+        process.env.JWT_SECRET_KEY,
+        {
+          expiresIn: "1h"
+        }
+      );
       return { key: token };
     } else {
       return { key: "unvalid user" };
