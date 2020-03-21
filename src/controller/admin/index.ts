@@ -39,18 +39,6 @@ export default {
         }
       }
     });
-    // const data = req.body;
-    // if (req.files["pageImage"]) {
-    //   data.pageImage = req.files["pageImage"][0].location;
-    //   data.bannerImage = req.files["bannerImage"][0].location;
-    //   data.buttonImage = req.files["buttonImage"][0].location;
-    // }
-    // const result = await service.addEventService(data);
-    // if (result["key"] === "detailPageUrl") {
-    //   res.status(409).send("detailPageUrl");
-    // } else {
-    //   res.status(201).end();
-    // }
   },
 
   putEventController: async (
@@ -79,23 +67,6 @@ export default {
         }
       }
     });
-
-    // const data = req.body;
-    // if (req.files["pageImage"]) {
-    //   data.pageImage = req.files["pageImage"][0].location;
-    // }
-    // if (req.files["bannerImage"]) {
-    //   data.bannerImage = req.files["bannerImage"][0].location;
-    // }
-    // if (req.files["buttonImage"]) {
-    //   data.buttonImage = req.files["buttonImage"][0].location;
-    // }
-    // const result = await service.putEventService(data, req.params.id);
-    // if (result["key"] === "detailPageUrl") {
-    //   res.status(409).send("detailPageUrl");
-    // } else {
-    //   res.status(200).end();
-    // }
   },
 
   getEventListController: async (
@@ -110,9 +81,6 @@ export default {
         res.status(200).json({ eventList: result });
       }
     });
-
-    // const result = await service.getEventListService();
-    // res.status(200).json({ eventList: result });
   },
 
   getEventEntryController: async (
@@ -127,9 +95,6 @@ export default {
         res.status(200).json(result);
       }
     });
-
-    // const result = await service.getEventEntryService(req.params.id);
-    // res.status(200).json(result);
   },
 
   deleteEventController: async (req: Request, res: Response): Promise<void> => {
@@ -141,13 +106,9 @@ export default {
         res.status(200).end();
       }
     });
-
-    // await service.deleteEventService(req.params.id);
-    // res.status(200).end();
   },
 
   signinController: async (req: Request, res: Response): Promise<void> => {
-    // console.log("여기!!!!!!!!!!!!!", req.body);
     const result = await service.signinService(req.body);
     if (result["key"] !== "unvalid user") {
       res.status(200).json({ token: result["key"] });
