@@ -1,6 +1,6 @@
 import * as express from "express";
-import controller from "../controller";
-const adminController = controller.adminController;
+import AdminController from "../controller/admin";
+const controller = new AdminController();
 const router = express.Router({ strict: true });
 
 import AWS from "aws-sdk";
@@ -38,25 +38,25 @@ const option = [
 router.post(
   "/events/entry",
   upload.fields(option),
-  adminController.addEventController
+  controller.addEventController
 );
 
-router.get("/events/list", adminController.getEventListController);
+router.get("/events/list", controller.getEventListController);
 
-router.get("/events/entry/:id", adminController.getEventEntryController);
+router.get("/events/entry/:id", controller.getEventEntryController);
 
-router.delete("/events/entry/:id", adminController.deleteEventController);
+router.delete("/events/entry/:id", controller.deleteEventController);
 
 router.put(
   "/events/entry/:id",
   upload.fields(option),
-  adminController.putEventController
+  controller.putEventController
 );
 
-router.post("/coupon", adminController.createCouponController);
+router.post("/coupon", controller.createCouponController);
 
-// router.get("/coupon/list", adminController.getCouponListController);
+// router.get("/coupon/list", controller.getCouponListController);
 
-router.post("/signin", adminController.signinController);
+router.post("/signin", controller.signinController);
 
 export default router;

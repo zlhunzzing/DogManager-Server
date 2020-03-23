@@ -2,8 +2,6 @@ import dotenv from "dotenv";
 dotenv.config();
 import { Request, Response } from "express";
 import adminService from "../../services/admin";
-import { Events } from "../../entity/Events";
-import { getRepository } from "typeorm";
 import jwt from "jsonwebtoken";
 
 const service = new adminService();
@@ -25,11 +23,11 @@ const verifyToken = (token, secretKey) => {
   });
 };
 
-export default {
-  addEventController: async (
+export default class AdminController {
+  async addEventController(
     req: Request & { files: MulterFile[] },
     res: Response
-  ): Promise<void> => {
+  ): Promise<void> {
     try {
       const token = req.headers.authorization;
       const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
@@ -48,12 +46,12 @@ export default {
     } catch (err) {
       res.status(401).end();
     }
-  },
+  }
 
-  putEventController: async (
+  async putEventController(
     req: Request & { files: MulterFile[] },
     res: Response
-  ): Promise<void> => {
+  ): Promise<void> {
     try {
       const token = req.headers.authorization;
       const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
@@ -76,12 +74,9 @@ export default {
     } catch (err) {
       res.status(401).end();
     }
-  },
+  }
 
-  getEventListController: async (
-    req: Request,
-    res: Response
-  ): Promise<void> => {
+  async getEventListController(req: Request, res: Response): Promise<void> {
     try {
       const token = req.headers.authorization;
       const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
@@ -90,12 +85,9 @@ export default {
     } catch (err) {
       res.status(401).end();
     }
-  },
+  }
 
-  getEventEntryController: async (
-    req: Request,
-    res: Response
-  ): Promise<void> => {
+  async getEventEntryController(req: Request, res: Response): Promise<void> {
     try {
       const token = req.headers.authorization;
       const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
@@ -108,9 +100,9 @@ export default {
       console.log(err);
       res.status(401).end();
     }
-  },
+  }
 
-  deleteEventController: async (req: Request, res: Response): Promise<void> => {
+  async deleteEventController(req: Request, res: Response): Promise<void> {
     try {
       const token = req.headers.authorization;
       const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
@@ -119,21 +111,18 @@ export default {
     } catch (err) {
       res.status(401).end();
     }
-  },
+  }
 
-  signinController: async (req: Request, res: Response): Promise<void> => {
+  async signinController(req: Request, res: Response): Promise<void> {
     const result = await service.signinService(req.body);
     if (result["key"] !== "unvalid user") {
       res.status(200).json({ token: result["key"] });
     } else {
       res.status(409).send("unvaild user");
     }
-  },
+  }
 
-  createCouponController: async (
-    req: Request,
-    res: Response
-  ): Promise<void> => {
+  async createCouponController(req: Request, res: Response): Promise<void> {
     try {
       const token = req.headers.authorization;
       const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
@@ -143,4 +132,4 @@ export default {
       res.status(401).end();
     }
   }
-};
+}

@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 dotenv.config();
-import { getConnection } from "typeorm";
 import { getRepository } from "typeorm";
 import { Events } from "../entity/Events";
 import { Admin } from "../entity/Admin";
@@ -30,15 +29,15 @@ interface CouponData {
 
 export default class AdminService {
   async addEventService(data: EventData): Promise<object> {
-    const indata = await getRepository(Events).findOne({
+    const inData = await getRepository(Events).findOne({
       where: [
         {
           detailPageUrl: data.detailPageUrl
         }
       ]
     });
-    if (indata) {
-      if (indata.detailPageUrl === data.detailPageUrl) {
+    if (inData) {
+      if (inData.detailPageUrl === data.detailPageUrl) {
         return { key: "detailPageUrl" };
       }
     }
@@ -60,13 +59,13 @@ export default class AdminService {
       }
     });
     if (result.detailPageUrl !== data.detailPageUrl) {
-      const indata = await getRepository(Events).findOne({
+      const inData = await getRepository(Events).findOne({
         where: {
           detailPageUrl: data.detailPageUrl
         }
       });
-      if (indata) {
-        if (indata.detailPageUrl === data.detailPageUrl) {
+      if (inData) {
+        if (inData.detailPageUrl === data.detailPageUrl) {
           return { key: "detailPageUrl" };
         }
       }
