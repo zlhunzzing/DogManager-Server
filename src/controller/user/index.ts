@@ -8,6 +8,15 @@ import UserService from "../../services/user";
 const service = new UserService();
 import jwt from "jsonwebtoken";
 
+const verifyToken = (token, secretKey) => {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, secretKey, (err, decoded) => {
+      if (err) reject(err);
+      else resolve(decoded);
+    });
+  });
+};
+
 export default class UserController {
   async getEventListController(req: Request, res: Response): Promise<void> {
     const result = await service.getEventListService();
@@ -34,6 +43,21 @@ export default class UserController {
       res.status(409).send("unvalid user");
     } else {
       res.status(200).json({ token: result["key"] });
+    }
+  }
+
+  async addCouponController(req: Request, res: Response): Promise<void> {
+    try {
+      const token = req.headers.authorization;
+      const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
+      const result = await service.addCouponService(req.body, userInfo);
+      if (result["key"] === "success") {
+        res.status(200).send("success");
+      } else {
+        res.status(409).send("duplicate");
+      }
+    } catch (err) {
+      res.status(40).end();
     }
   }
 }

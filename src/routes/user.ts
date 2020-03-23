@@ -11,7 +11,7 @@ router.post("/signup", controller.signupController);
 
 router.post("/signin", controller.signinController);
 
-// router.post("/coupon", controller.addCouponController);
+router.post("/coupon", controller.addCouponController);
 
 // router.get("/coupon/list", controller.getCouponListController);
 

@@ -18,10 +18,10 @@ export class UserCoupon {
   id: number;
 
   @Column()
-  couponId: string;
+  couponId: number;
 
   @Column()
-  userId: string;
+  userId: number;
 
   @Column()
   expiredAt: string;

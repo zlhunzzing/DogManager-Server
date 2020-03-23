@@ -4,6 +4,7 @@ import { getRepository } from "typeorm";
 import { Events } from "../entity/Events";
 import { User } from "../entity/User";
 import { Coupon } from "../entity/Coupon";
+import { UserCoupon } from "../entity/UserCoupon";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 
@@ -18,6 +19,15 @@ interface SignupData {
 interface SigninData {
   email: string;
   password: string;
+}
+
+interface CouponData {
+  couponName: string;
+  couponCode: string;
+  description: string;
+  period: number;
+  discount: string;
+  expiredAt: string;
 }
 
 export default class UserService {
@@ -103,5 +113,34 @@ export default class UserService {
     } else {
       return { key: "unvalid user" };
     }
+  }
+
+  async addCouponService(data: CouponData, info): Promise<object> {
+    // // 해당 이벤트의 쿠폰정보를 조회
+    const coupon = await getRepository(Coupon).findOne({
+      where: {
+        couponCode: data.couponCode
+      }
+    });
+    // // 조회한 쿠폰을 이미 가지고 있을 경우 중복처리
+    const inData = await getRepository(UserCoupon).findOne({
+      where: {
+        userId: info.id,
+        couponId: coupon.id
+      }
+    });
+    if (inData) {
+      console.log("중복");
+      return { key: "duplicate" };
+    }
+    // 쿠폰을 생성
+    const forInsertData = {
+      couponId: coupon.id,
+      userId: info.id,
+      expiredAt: data.expiredAt,
+      isDeleted: 1
+    };
+    await getRepository(UserCoupon).save(forInsertData);
+    return { key: "success" };
   }
 }
