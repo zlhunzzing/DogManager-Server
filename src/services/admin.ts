@@ -158,7 +158,43 @@ export default class AdminService {
     }
   }
 
-  async createCouponService(data: CouponData): Promise<void> {
+  async createCouponService(data: CouponData): Promise<object> {
+    const result = await getRepository(Coupon).findOne({
+      where: [
+        {
+          couponName: data.couponName
+        },
+        {
+          couponCode: data.couponCode
+        }
+      ]
+    });
+    if (result) {
+      if (result.couponName === data.couponName) {
+        return { key: "couponName already exist" };
+      } else if (result.couponCode === data.couponCode) {
+        return { key: "couponCode already exist" };
+      }
+    }
     await getRepository(Coupon).save(data);
+  }
+
+  async getCouponListService(): Promise<object> {
+    const couponList = await getRepository(Coupon).find({
+      where: {
+        isDeleted: false
+      }
+    });
+    return couponList;
+  }
+
+  async deleteCouponService(id): Promise<void> {
+    const result = await getRepository(Coupon).findOne({
+      where: {
+        id
+      }
+    });
+    result.isDeleted = true;
+    await getRepository(Coupon).save(result);
   }
 }

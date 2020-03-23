@@ -126,8 +126,39 @@ export default class AdminController {
     try {
       const token = req.headers.authorization;
       const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
-      await service.createCouponService(req.body);
+      const result = await service.createCouponService(req.body);
+      if (result) {
+        if (result["key"] === "couponName already exist") {
+          res.status(409).send("couponName already exist");
+        } else if (result["key"] === "couponCode already exist") {
+          res.status(409).send("couponCode already exist");
+        }
+      }
       res.status(201).end();
+    } catch (err) {
+      res.status(401).end();
+    }
+  }
+
+  async getCouponListController(req: Request, res: Response): Promise<void> {
+    try {
+      const token = req.headers.authorization;
+      const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
+      const couponList = await service.getCouponListService();
+      res.status(200).json({
+        couponList
+      });
+    } catch (err) {
+      res.status(401).end();
+    }
+  }
+
+  async deleteCouponController(req: Request, res: Response): Promise<void> {
+    try {
+      const token = req.headers.authorization;
+      const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
+      await service.deleteCouponService(req.params.id);
+      res.status(200).end();
     } catch (err) {
       res.status(401).end();
     }

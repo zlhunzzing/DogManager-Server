@@ -8,6 +8,12 @@ import { UserCoupon } from "../entity/UserCoupon";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 
+enum couponState {
+  enable,
+  disable,
+  canceled
+}
+
 interface SignupData {
   name: string;
   email: string;
@@ -20,6 +26,18 @@ interface SigninData {
   email: string;
   password: string;
 }
+
+const getRecentTime = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  let month = (now.getMonth() + 1).toString();
+  month = Number(month) < 10 ? "0" + month : month;
+  const date = now.getDate();
+  const hour = now.getHours();
+  const minute = now.getMinutes();
+  const result = "" + year + month + date + hour + minute;
+  return result;
+};
 
 interface CouponData {
   couponName: string;
@@ -115,6 +133,40 @@ export default class UserService {
     }
   }
 
+  async getCouponListService(tokenInfo): Promise<object> {
+    const userInfo = await getRepository(User).findOne({
+      where: {
+        id: tokenInfo.id
+      }
+    });
+    const userCouponInfo = await getRepository(UserCoupon).find({
+      where: {
+        userId: userInfo.id,
+        isDeleted: couponState.enable
+      }
+    });
+    const recentTime = getRecentTime();
+    const filteredUserCouponInfo = userCouponInfo.filter(x => {
+      if (Number(x.expiredAt) > Number(recentTime)) {
+        return x;
+      }
+    });
+
+    const couponInfo = await getRepository(Coupon).find({
+      where: filteredUserCouponInfo.map(x => {
+        return { id: x.couponId };
+      })
+    });
+    const result = [];
+    for (let i = 0; i < filteredUserCouponInfo.length; i++) {
+      result.push({
+        couponName: couponInfo[i].couponName,
+        description: couponInfo[i].description,
+        expiredAt: filteredUserCouponInfo[i].expiredAt
+      });
+    }
+    return result;
+  }
   async addCouponService(data: CouponData, info): Promise<object> {
     // // 해당 이벤트의 쿠폰정보를 조회
     const coupon = await getRepository(Coupon).findOne({
@@ -130,15 +182,13 @@ export default class UserService {
       }
     });
     if (inData) {
-      console.log("중복");
       return { key: "duplicate" };
     }
     // 쿠폰을 생성
     const forInsertData = {
       couponId: coupon.id,
       userId: info.id,
-      expiredAt: data.expiredAt,
-      isDeleted: 1
+      expiredAt: data.expiredAt
     };
     await getRepository(UserCoupon).save(forInsertData);
     return { key: "success" };

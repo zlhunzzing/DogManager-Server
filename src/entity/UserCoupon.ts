@@ -6,11 +6,11 @@ import {
   UpdateDateColumn
 } from "typeorm";
 
-// enum couponState {
-//   enable,
-//   disable,
-//   canceld
-// }
+enum couponState {
+  enable,
+  disable,
+  canceled
+}
 
 @Entity()
 export class UserCoupon {
@@ -26,7 +26,9 @@ export class UserCoupon {
   @Column()
   expiredAt: string;
 
-  @Column()
+  @Column({
+    default: couponState.enable
+  })
   isDeleted: number;
 
   @CreateDateColumn()

@@ -13,6 +13,6 @@ router.post("/signin", controller.signinController);
 
 router.post("/coupon", controller.addCouponController);
 
-// router.get("/coupon/list", controller.getCouponListController);
+router.get("/coupon/list", controller.getCouponListController);
 
 export default router;
