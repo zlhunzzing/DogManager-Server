@@ -4,7 +4,14 @@ import { getRepository } from "typeorm";
 import { Events } from "../entity/Events";
 import { Admin } from "../entity/Admin";
 import { Coupon } from "../entity/Coupon";
+import { UserCoupon } from "../entity/UserCoupon";
 import jwt from "jsonwebtoken";
+
+enum couponState {
+  enable,
+  disable,
+  canceled
+}
 
 interface EventData {
   eventTitle: string;
@@ -147,7 +154,7 @@ export default class AdminService {
           id: result.id,
           email
         },
-        process.env.JWT_SECRET_KEY,
+        process.env.JWT_ADMIN_SECRET_KEY,
         {
           expiresIn: "1h"
         }
@@ -189,6 +196,7 @@ export default class AdminService {
   }
 
   async deleteCouponService(id): Promise<void> {
+    // Coupon 테이블에서 해당 쿠폰 isDeleted 를 true로 변경
     const result = await getRepository(Coupon).findOne({
       where: {
         id
@@ -196,5 +204,18 @@ export default class AdminService {
     });
     result.isDeleted = true;
     await getRepository(Coupon).save(result);
+
+    // UserCoupon 테이블에서 해당쿠폰이 들어간 모든 열의 isDeleted를
+    // couponState.canceled 로 변경
+    const UserCouponList = await getRepository(UserCoupon).find({
+      where: {
+        couponId: result.id
+      }
+    });
+    const result2 = await UserCouponList.map(x => {
+      x.isDeleted = couponState.canceled;
+      return x;
+    });
+    await getRepository(UserCoupon).save(result2);
   }
 }
