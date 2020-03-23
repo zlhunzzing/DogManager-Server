@@ -135,6 +135,8 @@ export default class UserService {
         isDeleted: couponState.enable
       }
     });
+    const recentTime = getRecentTime();
+    console.log(recentTime);
     const temp = [];
     for (let i = 0; i < userCouponInfo.length; i++) {
       temp.push(userCouponInfo[i].couponId);
