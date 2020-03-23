@@ -177,30 +177,14 @@ export default class AdminService {
       }
     }
     await getRepository(Coupon).save(data);
-
-    // const result = await getRepository(Coupon).findOne({
-    //   where: [
-    //     {
-    //       couponCode: data.couponCode
-    //     },
-    //     {
-    //       couponName: data.couponName
-    //     }
-    //   ]
-    // });
-    // if (result) {
-    //   if (result.couponCode === data.couponCode) {
-    //     return { key: "couponCode already exist" };
-    //   } else if (result.couponName === data.couponName) {
-    //     return { key: "couponName already exist" };
-    //   }
-    // } else {
-    //   await getRepository(Coupon).save(data);
-    // }
   }
 
   async getCouponListService(): Promise<object> {
-    const couponList = await getRepository(Coupon).find();
+    const couponList = await getRepository(Coupon).find({
+      where: {
+        isDeleted: false
+      }
+    });
     return couponList;
   }
 }

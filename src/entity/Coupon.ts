@@ -31,4 +31,10 @@ export class Coupon {
 
   @UpdateDateColumn()
   updatedAt: string;
+
+  @Column({
+    type: "boolean",
+    default: false
+  })
+  isDeleted: boolean;
 }
