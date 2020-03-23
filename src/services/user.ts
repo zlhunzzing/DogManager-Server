@@ -30,13 +30,15 @@ interface SigninData {
 const getRecentTime = () => {
   const now = new Date();
   const year = now.getFullYear();
-  const month = now.getMonth();
+  let month = (now.getMonth() + 1).toString();
+  month = Number(month) < 10 ? "0" + month : month;
   const date = now.getDate();
   const hour = now.getHours();
   const minute = now.getMinutes();
   const result = "" + year + month + date + hour + minute;
   return result;
 };
+
 interface CouponData {
   couponName: string;
   couponCode: string;
@@ -144,24 +146,23 @@ export default class UserService {
       }
     });
     const recentTime = getRecentTime();
-    console.log(recentTime);
-    const temp = [];
-    for (let i = 0; i < userCouponInfo.length; i++) {
-      temp.push(userCouponInfo[i].couponId);
-    }
+    const filteredUserCouponInfo = userCouponInfo.filter(x => {
+      if (Number(x.expiredAt) > Number(recentTime)) {
+        return x;
+      }
+    });
+
     const couponInfo = await getRepository(Coupon).find({
-      where: [
-        {
-          id: temp
-        }
-      ]
+      where: filteredUserCouponInfo.map(x => {
+        return { id: x.couponId };
+      })
     });
     const result = [];
-    for (let i = 0; i < temp.length; i++) {
+    for (let i = 0; i < filteredUserCouponInfo.length; i++) {
       result.push({
         couponName: couponInfo[i].couponName,
         description: couponInfo[i].description,
-        expiredAt: userCouponInfo[i].expiredAt
+        expiredAt: filteredUserCouponInfo[i].expiredAt
       });
     }
     return result;

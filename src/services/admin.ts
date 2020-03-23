@@ -187,4 +187,14 @@ export default class AdminService {
     });
     return couponList;
   }
+
+  async deleteCouponService(id): Promise<void> {
+    const result = await getRepository(Coupon).findOne({
+      where: {
+        id
+      }
+    });
+    result.isDeleted = true;
+    await getRepository(Coupon).save(result);
+  }
 }

@@ -65,12 +65,12 @@ export default class UserController {
       const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
       const result = await service.addCouponService(req.body, userInfo);
       if (result["key"] === "success") {
-        res.status(200).send("success");
+        res.status(201).send("success");
       } else {
         res.status(409).send("duplicate");
       }
     } catch (err) {
-      res.status(40).end();
+      res.status(401).end();
     }
   }
 }

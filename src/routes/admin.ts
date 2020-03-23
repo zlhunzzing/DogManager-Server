@@ -59,4 +59,6 @@ router.get("/coupon/list", controller.getCouponListController);
 
 router.post("/signin", controller.signinController);
 
+router.delete("/coupon/:id", controller.deleteCouponController);
+
 export default router;

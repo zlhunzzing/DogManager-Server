@@ -152,4 +152,15 @@ export default class AdminController {
       res.status(401).end();
     }
   }
+
+  async deleteCouponController(req: Request, res: Response): Promise<void> {
+    try {
+      const token = req.headers.authorization;
+      const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
+      await service.deleteCouponService(req.params.id);
+      res.status(200).end();
+    } catch (err) {
+      res.status(401).end();
+    }
+  }
 }
