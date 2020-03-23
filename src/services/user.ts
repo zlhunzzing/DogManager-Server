@@ -27,6 +27,17 @@ interface SigninData {
   password: string;
 }
 
+const getRecentTime = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const date = now.getDate();
+  const hour = now.getHours();
+  const minute = now.getMinutes();
+  const result = "" + year + month + date + hour + minute;
+  return result;
+};
+
 export default class UserService {
   async getEventListService(): Promise<object> {
     const result = await getRepository(Events).find({
@@ -129,9 +140,11 @@ export default class UserService {
       temp.push(userCouponInfo[i].couponId);
     }
     const couponInfo = await getRepository(Coupon).find({
-      where: {
-        id: temp
-      }
+      where: [
+        {
+          id: temp
+        }
+      ]
     });
     const result = [];
     for (let i = 0; i < temp.length; i++) {
