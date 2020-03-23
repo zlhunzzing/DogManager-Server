@@ -30,7 +30,10 @@ export default class AdminController {
   ): Promise<void> {
     try {
       const token = req.headers.authorization;
-      const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
+      const userInfo = await verifyToken(
+        token,
+        process.env.JWT_ADMIN_SECRET_KEY
+      );
       const data = req.body;
       if (req.files["pageImage"]) {
         data.pageImage = req.files["pageImage"][0].location;
@@ -54,7 +57,10 @@ export default class AdminController {
   ): Promise<void> {
     try {
       const token = req.headers.authorization;
-      const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
+      const userInfo = await verifyToken(
+        token,
+        process.env.JWT_ADMIN_SECRET_KEY
+      );
       const data = req.body;
       if (req.files["pageImage"]) {
         data.pageImage = req.files["pageImage"][0].location;
@@ -79,7 +85,10 @@ export default class AdminController {
   async getEventListController(req: Request, res: Response): Promise<void> {
     try {
       const token = req.headers.authorization;
-      const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
+      const userInfo = await verifyToken(
+        token,
+        process.env.JWT_ADMIN_SECRET_KEY
+      );
       const result = await service.getEventListService();
       res.status(200).json({ eventList: result });
     } catch (err) {
@@ -90,7 +99,10 @@ export default class AdminController {
   async getEventEntryController(req: Request, res: Response): Promise<void> {
     try {
       const token = req.headers.authorization;
-      const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
+      const userInfo = await verifyToken(
+        token,
+        process.env.JWT_ADMIN_SECRET_KEY
+      );
       const result = await service.getEventEntryService(
         req.params.id,
         req.body.couponCode
@@ -105,7 +117,10 @@ export default class AdminController {
   async deleteEventController(req: Request, res: Response): Promise<void> {
     try {
       const token = req.headers.authorization;
-      const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
+      const userInfo = await verifyToken(
+        token,
+        process.env.JWT_ADMIN_SECRET_KEY
+      );
       await service.deleteEventService(req.params.id);
       res.status(200).end();
     } catch (err) {
@@ -125,7 +140,10 @@ export default class AdminController {
   async createCouponController(req: Request, res: Response): Promise<void> {
     try {
       const token = req.headers.authorization;
-      const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
+      const userInfo = await verifyToken(
+        token,
+        process.env.JWT_ADMIN_SECRET_KEY
+      );
       const result = await service.createCouponService(req.body);
       if (result) {
         if (result["key"] === "couponName already exist") {
@@ -143,7 +161,10 @@ export default class AdminController {
   async getCouponListController(req: Request, res: Response): Promise<void> {
     try {
       const token = req.headers.authorization;
-      const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
+      const userInfo = await verifyToken(
+        token,
+        process.env.JWT_ADMIN_SECRET_KEY
+      );
       const couponList = await service.getCouponListService();
       res.status(200).json({
         couponList
@@ -156,7 +177,10 @@ export default class AdminController {
   async deleteCouponController(req: Request, res: Response): Promise<void> {
     try {
       const token = req.headers.authorization;
-      const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
+      const userInfo = await verifyToken(
+        token,
+        process.env.JWT_ADMIN_SECRET_KEY
+      );
       await service.deleteCouponService(req.params.id);
       res.status(200).end();
     } catch (err) {

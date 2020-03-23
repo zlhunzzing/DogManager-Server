@@ -94,7 +94,7 @@ export default class UserService {
     if (result) {
       return { key: "already exist" };
     }
-    const shasum = crypto.createHmac("sha512", "@thisissecretkey");
+    const shasum = crypto.createHmac("sha512", process.env.CRYPTO_SECRET_KEY);
     shasum.update(data.password);
     data.password = shasum.digest("hex");
     const user = new User();
@@ -107,7 +107,7 @@ export default class UserService {
   }
 
   async signinService(data: SigninData): Promise<object> {
-    const shasum = crypto.createHmac("sha512", "@thisissecretkey");
+    const shasum = crypto.createHmac("sha512", process.env.CRYPTO_SECRET_KEY);
     shasum.update(data.password);
     data.password = shasum.digest("hex");
     const result = await getRepository(User).findOne({
@@ -122,7 +122,7 @@ export default class UserService {
           id: result.id,
           email: result.email
         },
-        process.env.JWT_SECRET_KEY,
+        process.env.JWT_USER_SECRET_KEY,
         {
           expiresIn: "1h"
         }

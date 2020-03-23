@@ -49,7 +49,10 @@ export default class UserController {
   async getCouponListController(req: Request, res: Response): Promise<void> {
     try {
       const token = req.headers.authorization;
-      const tokenInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
+      const tokenInfo = await verifyToken(
+        token,
+        process.env.JWT_USER_SECRET_KEY
+      );
       const result = await service.getCouponListService(tokenInfo);
       res.status(200).json({
         couponList: result
@@ -62,7 +65,10 @@ export default class UserController {
   async addCouponController(req: Request, res: Response): Promise<void> {
     try {
       const token = req.headers.authorization;
-      const userInfo = await verifyToken(token, process.env.JWT_SECRET_KEY);
+      const userInfo = await verifyToken(
+        token,
+        process.env.JWT_USER_SECRET_KEY
+      );
       const result = await service.addCouponService(req.body, userInfo);
       if (result["key"] === "success") {
         res.status(201).send("success");
