@@ -37,6 +37,14 @@ const getRecentTime = () => {
   const result = "" + year + month + date + hour + minute;
   return result;
 };
+interface CouponData {
+  couponName: string;
+  couponCode: string;
+  description: string;
+  period: number;
+  discount: string;
+  expiredAt: string;
+}
 
 export default class UserService {
   async getEventListService(): Promise<object> {
@@ -157,5 +165,31 @@ export default class UserService {
       });
     }
     return result;
+  }
+  async addCouponService(data: CouponData, info): Promise<object> {
+    // // 해당 이벤트의 쿠폰정보를 조회
+    const coupon = await getRepository(Coupon).findOne({
+      where: {
+        couponCode: data.couponCode
+      }
+    });
+    // // 조회한 쿠폰을 이미 가지고 있을 경우 중복처리
+    const inData = await getRepository(UserCoupon).findOne({
+      where: {
+        userId: info.id,
+        couponId: coupon.id
+      }
+    });
+    if (inData) {
+      return { key: "duplicate" };
+    }
+    // 쿠폰을 생성
+    const forInsertData = {
+      couponId: coupon.id,
+      userId: info.id,
+      expiredAt: data.expiredAt
+    };
+    await getRepository(UserCoupon).save(forInsertData);
+    return { key: "success" };
   }
 }
