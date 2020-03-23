@@ -146,12 +146,15 @@ export default class UserService {
       }
     });
     const recentTime = getRecentTime();
-    const filteredUserCouponInfo = userCouponInfo.filter(x => {
+    const filteredUserCouponInfo = [];
+    await userCouponInfo.forEach(async x => {
       if (Number(x.expiredAt) > Number(recentTime)) {
-        return x;
+        filteredUserCouponInfo.push(x);
+      } else {
+        x.isDeleted = couponState.canceled;
+        await getRepository(UserCoupon).save(x);
       }
     });
-
     const couponInfo = await getRepository(Coupon).find({
       where: filteredUserCouponInfo.map(x => {
         return { id: x.couponId };
