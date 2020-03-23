@@ -16,11 +16,11 @@ export interface MulterFile {
   size: number;
 }
 
-export default {
-  addEventController: async (
+export default class AdminController {
+  async addEventController(
     req: Request & { files: MulterFile[] },
     res: Response
-  ): Promise<void> => {
+  ): Promise<void> {
     const token = req.headers.authorization;
     jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, decoded) => {
       if (err) return res.status(401).end();
@@ -39,12 +39,12 @@ export default {
         }
       }
     });
-  },
+  }
 
-  putEventController: async (
+  async putEventController(
     req: Request & { files: MulterFile[] },
     res: Response
-  ): Promise<void> => {
+  ): Promise<void> {
     const token = req.headers.authorization;
     jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, decoded) => {
       if (err) return res.status(401).end();
@@ -67,12 +67,9 @@ export default {
         }
       }
     });
-  },
+  }
 
-  getEventListController: async (
-    req: Request,
-    res: Response
-  ): Promise<void> => {
+  async getEventListController(req: Request, res: Response): Promise<void> {
     const token = req.headers.authorization;
     jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, decoded) => {
       if (err) return res.status(401).end();
@@ -81,12 +78,9 @@ export default {
         res.status(200).json({ eventList: result });
       }
     });
-  },
+  }
 
-  getEventEntryController: async (
-    req: Request,
-    res: Response
-  ): Promise<void> => {
+  async getEventEntryController(req: Request, res: Response): Promise<void> {
     const token = req.headers.authorization;
     jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, decoded) => {
       if (err) return res.status(401).end();
@@ -98,9 +92,9 @@ export default {
         res.status(200).json(result);
       }
     });
-  },
+  }
 
-  deleteEventController: async (req: Request, res: Response): Promise<void> => {
+  async deleteEventController(req: Request, res: Response): Promise<void> {
     const token = req.headers.authorization;
     jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, decoded) => {
       if (err) return res.status(401).end();
@@ -109,21 +103,18 @@ export default {
         res.status(200).end();
       }
     });
-  },
+  }
 
-  signinController: async (req: Request, res: Response): Promise<void> => {
+  async signinController(req: Request, res: Response): Promise<void> {
     const result = await service.signinService(req.body);
     if (result["key"] !== "unvalid user") {
       res.status(200).json({ token: result["key"] });
     } else {
       res.status(409).send("unvaild user");
     }
-  },
+  }
 
-  createCouponController: async (
-    req: Request,
-    res: Response
-  ): Promise<void> => {
+  async createCouponController(req: Request, res: Response): Promise<void> {
     const token = req.headers.authorization;
     jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, decoded) => {
       if (err) return res.status(401).end();
@@ -133,4 +124,4 @@ export default {
       }
     });
   }
-};
+}

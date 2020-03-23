@@ -1,18 +1,18 @@
 import * as express from "express";
-import controller from "../controller";
-const userController = controller.userController;
+import UserController from "../controller/user";
+const controller = new UserController();
 const router = express.Router({ strict: true });
 
-router.get("/events/list", userController.getEventListController);
+router.get("/events/list", controller.getEventListController);
 
-router.get("/events/entry/:url", userController.getEventEntryController);
+router.get("/events/entry/:url", controller.getEventEntryController);
 
-router.post("/signup", userController.signupController);
+router.post("/signup", controller.signupController);
 
-router.post("/signin", userController.signinController);
+router.post("/signin", controller.signinController);
 
-// router.post("/coupon", userController.addCouponController);
+// router.post("/coupon", controller.addCouponController);
 
-// router.get("/coupon/list", userController.getCouponListController);
+// router.get("/coupon/list", controller.getCouponListController);
 
 export default router;
