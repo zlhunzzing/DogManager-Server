@@ -55,7 +55,7 @@ router.put(
 
 router.post("/coupon", controller.createCouponController);
 
-// router.get("/coupon/list", controller.getCouponListController);
+router.get("/coupon/list", controller.getCouponListController);
 
 router.post("/signin", controller.signinController);
 

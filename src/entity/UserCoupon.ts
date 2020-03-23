@@ -9,7 +9,7 @@ import {
 // enum couponState {
 //   enable,
 //   disable,
-//   canceld
+//   canceled
 // }
 
 @Entity()
