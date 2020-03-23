@@ -108,7 +108,7 @@ export default class AdminService {
     });
     const couponInfo = await getRepository(Coupon).findOne({
       where: {
-        couponCode
+        couponCode: eventInfo.couponCode
       }
     });
     const couponListInfo = await getRepository(Coupon).find({
@@ -116,8 +116,8 @@ export default class AdminService {
     });
     const result = {
       ...eventInfo,
-      couponName: couponInfo.couponName,
-      couponList: couponListInfo
+      couponName: couponInfo ? couponInfo.couponName : null,
+      couponList: couponListInfo ? couponListInfo : null
     };
     return result;
   }
