@@ -17,11 +17,11 @@ const dataForCreateEvent = (num: number = 1): object => {
     eventTitle: `new event ${num}`,
     startDate: "202003161105",
     endDate: "202004012359",
-    detailPageUrl: "detail page url",
-    buttonUrl: "button url",
+    detailPageUrl: `detail page url ${num}`,
     buttonImage: "button image",
     bannerImage: "banner image",
-    pageImage: "page image"
+    pageImage: "page image",
+    couponCode: "coupon code"
   };
 };
 
@@ -47,46 +47,13 @@ describe("Implemented testcase", () => {
       password: "1234"
     };
     await getRepository(Admin).save(adminInfo);
-    // chai
-    //   .request(app)
-    //   .post("/api/admin/signin")
-    //   .send({
-    //     email: "admin@dogmate.com",
-    //     password: "1234"
-    //   })
-    //   .end((err, res) => {
-    //     token = res.body.token;
-    //   });
   });
   afterEach(async () => {
     const repository = await getRepository(Events);
     await repository.query(`TRUNCATE TABLE events;`);
   });
 
-  describe("POST Method", () => {
-    it("should create a new event", done => {
-      const agent = chai.request.agent(app);
-      agent
-        .post("/api/admin/events/entry")
-        .set("Authorization", getToken())
-        .field("eventTitle", "new event 1")
-        .field("startDate", "202003161105")
-        .field("endDate", "202004012359")
-        .field("detailPageUrl", "detail page url")
-        .field("couponCode", "code1234")
-        .field("buttonImage", "button image")
-        .field("bannerImage", "banner image")
-        .field("pageImage", "page image")
-        // .set("content-type", "multipart/form-data")
-        // .send(dataForCreateEvent())
-        .end((err, res) => {
-          if (err) done(err);
-          expect(res).to.have.status(201);
-          done();
-        });
-    });
-  });
-  describe("Data exist Already", () => {
+  describe("EVENT API TEST", () => {
     beforeEach(() => {
       getConnection()
         .createQueryBuilder()
@@ -95,7 +62,38 @@ describe("Implemented testcase", () => {
         .values([dataForCreateEvent(1), dataForCreateEvent(3)])
         .execute();
     });
-    describe("GET Method", () => {
+    describe("POST /api/admin/events/entry", () => {
+      it("should create a new event", done => {
+        const agent = chai.request.agent(app);
+        agent
+          .post("/api/admin/events/entry")
+          .set("Authorization", getToken())
+          .field("eventTitle", "new event 4")
+          .field("startDate", "202003161105")
+          .field("endDate", "202004012359")
+          .field("detailPageUrl", "detail page url")
+          .field("couponCode", "code1234")
+          .field("buttonImage", "button image")
+          .field("bannerImage", "banner image")
+          .field("pageImage", "page image")
+          .end((err, res) => {
+            if (err) done(err);
+            expect(res).to.have.status(201);
+            done();
+          });
+      });
+    });
+
+    // describe("Data exist Already", () => {
+    // beforeEach(() => {
+    //   getConnection()
+    //     .createQueryBuilder()
+    //     .insert()
+    //     .into(Events)
+    //     .values([dataForCreateEvent(1), dataForCreateEvent(3)])
+    //     .execute();
+    // });
+    describe("GET /api/admin/events/list", () => {
       it("should get all event lists", done => {
         const agent = chai.request.agent(app);
         agent
@@ -108,7 +106,9 @@ describe("Implemented testcase", () => {
             done();
           });
       });
+    });
 
+    describe("GET /api/admin/events/entry/:id", () => {
       it("should get information of selected event", done => {
         const agent = chai.request.agent(app);
         agent
@@ -138,7 +138,7 @@ describe("Implemented testcase", () => {
       });
     });
 
-    describe("PUT Method", () => {
+    describe("PUT /api/admin/events/entry/:id", () => {
       it("should edit a information of event", done => {
         const agent = chai.request.agent(app);
         agent
@@ -160,14 +160,13 @@ describe("Implemented testcase", () => {
                 if (err) done(err);
                 expect(res).to.have.status(200);
                 expect(res.body.eventTitle).to.equal("new event 2");
-                // expect(res.body.deta).to.equal("new event 2");
                 done();
               });
           });
       });
     });
 
-    describe("DELETE Method", () => {
+    describe("DELETE /api/admin/events/entry/:id", () => {
       it("should delete event", done => {
         const agent = chai.request.agent(app);
         agent
@@ -186,10 +185,11 @@ describe("Implemented testcase", () => {
           });
       });
     });
+    // });
   });
 
-  describe("Login API test", () => {
-    describe("Admin login test", () => {
+  describe("LOGIN API TEST", () => {
+    describe("POST /api/admin/signin", () => {
       beforeEach(async () => {
         const adminData = {
           email: "admin@dogmate.com",
@@ -217,5 +217,61 @@ describe("Implemented testcase", () => {
           });
       });
     });
+
+    describe("POST /api/user/signup", () => {
+      it("it should response 201 status code with user info to signup data", done => {
+        const agent = chai.request.agent(app);
+        agent
+          .post("/api/user/signup")
+          .send({
+            name: "user",
+            email: "user@dogmate.com",
+            password: "1234",
+            mobile: "1234",
+            address: "string"
+          })
+          .end((err, res) => {
+            if (err) done(err);
+            expect(res).to.have.status(201);
+            done();
+          });
+      });
+    });
+
+    describe("POST /api/user/signin", () => {
+      beforeEach(async () => {
+        const agent = chai.request.agent(app);
+        await agent.post("/api/user/signup").send({
+          name: "user",
+          email: "user@dogmate.com",
+          password: "1234",
+          mobile: "1234",
+          address: "string"
+        });
+      });
+      it("should have a token", done => {
+        const agent = chai.request.agent(app);
+        agent
+          .post("/api/user/signin")
+          .send({
+            email: "user@dogmate.com",
+            password: "1234"
+          })
+          .end((err, res) => {
+            if (err) done(err);
+            expect(res).to.have.status(200);
+            expect(res.body).has.all.keys(["token"]);
+            done();
+          });
+      });
+    });
+  });
+
+  describe("COUPON API TEST", () => {
+    describe("POST /api/admin/coupon", () => {});
+    describe("POST /api/user/coupon", () => {});
+    describe("GET /api/admin/coupon/list", () => {});
+    describe("GET /api/user/coupon/list", () => {});
+    describe("DELETE /api/admin/coupon/:id", () => {});
   });
 });
