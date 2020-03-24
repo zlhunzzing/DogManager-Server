@@ -75,12 +75,12 @@ export default class UserService {
     });
     const couponInfo = await getRepository(Coupon).findOne({
       where: {
-        couponCode: eventInfo.couponCode
+        couponCode: eventInfo.couponCode ? eventInfo.couponCode : null
       }
     });
     const result = {
       ...eventInfo,
-      period: couponInfo.period
+      period: couponInfo ? couponInfo.period : null
     };
     return result;
   }
