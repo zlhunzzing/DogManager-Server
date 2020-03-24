@@ -70,13 +70,15 @@ describe("Implemented testcase", () => {
   });
 
   describe("EVENT API TEST", () => {
-    beforeEach(() => {
-      getConnection()
-        .createQueryBuilder()
-        .insert()
-        .into(Events)
-        .values([dataForCreateEvent(1), dataForCreateEvent(3)])
-        .execute();
+    beforeEach(async () => {
+      // getConnection()
+      //   .createQueryBuilder()
+      //   .insert()
+      //   .into(Events)
+      //   .values([dataForCreateEvent(1), dataForCreateEvent(3)])
+      //   .execute();
+      const data = [dataForCreateEvent(1), dataForCreateEvent(3)];
+      await getRepository(Events).save(data);
     });
     describe("POST /api/admin/events/entry", () => {
       it("should create a new event", done => {
