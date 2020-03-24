@@ -9,6 +9,8 @@ const expect = chai.expect;
 import { createTypeormConnection } from "../utils/createTypeormConnection";
 import { Events } from "../entity/Events";
 import { Admin } from "../entity/Admin";
+import { Coupon } from "../entity/Coupon";
+import { UserCoupon } from "../entity/UserCoupon";
 import { getRepository, getConnection, Repository } from "typeorm";
 import jwt from "jsonwebtoken";
 
@@ -282,10 +284,34 @@ describe("Implemented testcase", () => {
   });
 
   describe("COUPON API TEST", () => {
-    describe("POST /api/admin/coupon", () => {});
+    afterEach(async () => {
+      const CouponTable = await getRepository(Coupon);
+      await CouponTable.query(`TRUNCATE TABLE coupon;`);
+      const UserCouponTable = await getRepository(UserCoupon);
+      await UserCouponTable.query(`TRUNCATE TABLE user_coupon;`);
+    });
+    describe("POST /api/admin/coupon", () => {
+      it("should create a new coupon", done => {
+        const agent = chai.request.agent(app);
+        agent
+          .post("/api/admin/coupon")
+          .set("Authorization", getToken())
+          .send({
+            couponName: "first coupon",
+            couponCode: "@first",
+            description: "this is first coupon",
+            period: 7,
+            discount: "20%"
+          })
+          .end((err, res) => {
+            expect(res).to.have.status(201);
+            done();
+          });
+      });
+    });
     describe("POST /api/user/coupon", () => {
       beforeEach(async () => {
-        //발급할 쿠폰 생성
+        // 발급할 쿠폰 생성
         const agent = chai.request.agent(app);
         await agent
           .post("/api/admin/coupon")
@@ -296,7 +322,7 @@ describe("Implemented testcase", () => {
             period: 7,
             discount: "50"
           })
-          .set("Authorization", getUserToken());
+          .set("Authorization", getToken());
       });
       it("coupon issuance upon event click", done => {
         const agent = chai.request.agent(app);
@@ -310,27 +336,77 @@ describe("Implemented testcase", () => {
           .end((err, res) => {
             if (err) done(err);
             expect(res).to.have.status(201);
-            // Body 검사 추가 필요
             done();
           });
       });
     });
-    describe("GET /api/admin/coupon/list", () => {});
-    describe("GET /api/user/coupon/list", () => {
+
+    describe("GET /api/admin/coupon/list", () => {
       beforeEach(async () => {
-        //유저 생성
+        const couponData1 = {
+          couponName: "coupon1",
+          couponCode: "code1",
+          description: "first coupon",
+          period: 7,
+          discount: "10%"
+        };
+        const couponData2 = {
+          couponName: "coupon2",
+          couponCode: "code2",
+          description: "second coupon",
+          period: 7,
+          discount: "10%"
+        };
+        const arr = [couponData1, couponData2];
+        await getRepository(Coupon).save(arr);
+      });
+      it("should get all coupon list", done => {
+        const agent = chai.request.agent(app);
+        agent
+          .get("/api/admin/coupon/list")
+          .set("Authorization", getToken())
+          .end((err, res) => {
+            expect(res).to.have.status(200);
+            expect(res.body.couponList.length).to.equal(2);
+            done();
+          });
+      });
+    });
+
+    describe("GET /api/user/coupon/list", () => {
+      before(async () => {
+        // 유저 생성
+        const agent = chai.request.agent(app);
+        await agent.post("/api/user/signup").send({
+          name: "user",
+          email: "user@dogmate.com",
+          password: "1234",
+          mobile: "12341234",
+          address: "1"
+        });
+      });
+      // .set("Authorization", getUserToken());
+      beforeEach(async () => {
         const agent = chai.request.agent(app);
         await agent
-          .post("/api/user/signup")
+          .post("/api/admin/coupon")
+          .set("Authorization", getToken())
           .send({
-            name: "user",
-            email: "user@dogmate.com",
-            password: "1234",
-            mobile: "12341234",
-            address: "1"
+            couponName: "coupon2",
+            couponCode: "code2",
+            description: "second coupon",
+            period: 7,
+            discount: "10%"
+          });
+        await agent
+          .post("/api/user/coupon")
+          .send({
+            couponCode: "code2",
+            expiredAt: "202104010200"
           })
           .set("Authorization", getUserToken());
       });
+
       it("coupon issuance upon event click", done => {
         const agent = chai.request.agent(app);
         agent
@@ -344,6 +420,41 @@ describe("Implemented testcase", () => {
           });
       });
     });
-    describe("DELETE /api/admin/coupon/:id", () => {});
+    describe("DELETE /api/admin/coupon/:id", () => {
+      beforeEach(async () => {
+        const couponData1 = {
+          couponName: "coupon1",
+          couponCode: "code1",
+          description: "first coupon",
+          period: 7,
+          discount: "10%"
+        };
+        const couponData2 = {
+          couponName: "coupon2",
+          couponCode: "code2",
+          description: "second coupon",
+          period: 7,
+          discount: "10%"
+        };
+        const arr = [couponData1, couponData2];
+        await getRepository(Coupon).save(arr);
+      });
+      it("should delete coupon", done => {
+        const agent = chai.request.agent(app);
+        agent
+          .delete("/api/admin/coupon/2")
+          .set("Authorization", getToken())
+          .then(res1 => {
+            expect(res1).to.have.status(200);
+            agent
+              .get("/api/admin/coupon/list")
+              .set("Authorization", getToken())
+              .end((err, res2) => {
+                expect(res2.body.couponList.length).to.equal(1);
+                done();
+              });
+          });
+      });
+    });
   });
 });
