@@ -72,7 +72,7 @@ describe("Implemented testcase", () => {
 
   describe("EVENT API TEST", () => {
     beforeEach(async () => {
-      const data = [dataForCreateEvent(1), dataForCreateEvent(3)];
+      const data = [dataForCreateEvent(1), dataForCreateEvent(2)];
       await getRepository(Events).save(data);
     });
     describe("POST /api/admin/events/entry", () => {
@@ -81,7 +81,7 @@ describe("Implemented testcase", () => {
         agent
           .post("/api/admin/events/entry")
           .set("Authorization", getToken())
-          .field("eventTitle", "new event 4")
+          .field("eventTitle", "new event 3")
           .field("startDate", "202003161105")
           .field("endDate", "202004012359")
           .field("detailPageUrl", "detail page url")
@@ -92,6 +92,26 @@ describe("Implemented testcase", () => {
           .end((err, res) => {
             if (err) done(err);
             expect(res).to.have.status(201);
+            done();
+          });
+      });
+      it("If the detailPageUrl is duplicated, the status code 409 must be returned", done => {
+        const agent = chai.request.agent(app);
+        agent
+          .post("/api/admin/events/entry")
+          .set("Authorization", getToken())
+          .field("eventTitle", "new event 3")
+          .field("startDate", "202003161105")
+          .field("endDate", "202004012359")
+          .field("detailPageUrl", "detail page url 1")
+          .field("couponCode", "code1234")
+          .field("buttonImage", "button image")
+          .field("bannerImage", "banner image")
+          .field("pageImage", "page image")
+          .end((err, res) => {
+            if (err) done(err);
+            expect(res).to.have.status(409);
+            expect(res.text).to.equal("detailPageUrl");
             done();
           });
       });
@@ -148,7 +168,7 @@ describe("Implemented testcase", () => {
         agent
           .put("/api/admin/events/entry/1")
           .set("Authorization", getToken())
-          .field("eventTitle", "new event 2")
+          .field("eventTitle", "new event 3")
           .field("startDate", "202003161105")
           .field("endDate", "202004012359")
           .field("detailPageUrl", "detail page url")
@@ -163,9 +183,29 @@ describe("Implemented testcase", () => {
               .end((err, res) => {
                 if (err) done(err);
                 expect(res).to.have.status(200);
-                expect(res.body.eventTitle).to.equal("new event 2");
+                expect(res.body.eventTitle).to.equal("new event 3");
                 done();
               });
+          });
+      });
+      it("If the detailPageUrl is duplicated, the status code 409 must be returned", done => {
+        const agent = chai.request.agent(app);
+        agent
+          .put("/api/admin/events/entry/1")
+          .set("Authorization", getToken())
+          .field("eventTitle", "new event 1")
+          .field("startDate", "202003161105")
+          .field("endDate", "202004012359")
+          .field("detailPageUrl", "detail page url 2")
+          .field("couponCode", "code1234")
+          .field("buttonImage", "button image")
+          .field("bannerImage", "banner image")
+          .field("pageImage", "page image")
+          .end((err, res) => {
+            if (err) done(err);
+            expect(res).to.have.status(409);
+            expect(res.text).to.equal("detailPageUrl");
+            done();
           });
       });
     });
@@ -559,7 +599,6 @@ describe("Implemented testcase", () => {
               "description",
               "expiredAt"
             ]);
-            // Body 검사 추가 필요
             done();
           });
       });
