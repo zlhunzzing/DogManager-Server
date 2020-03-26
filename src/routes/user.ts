@@ -19,4 +19,15 @@ router.get("/comment/entry/:commentId", controller.deleteCommentController);
 
 router.put("/comment/entry/:commentId", controller.updateCommentController);
 
+router.post("/comment/entry", controller.addCommentController);
+
+router.post("/comment/entry/thumb/:commentId", controller.addThumbController);
+
+router.delete(
+  "/comment/entry/thumb/:commentId",
+  controller.removeThumbController
+);
+
+router.get("/thumb/list/:eventUrl", controller.getUserThumbsListController);
+
 export default router;

@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
-import { getRepository } from "typeorm";
+import { getRepository, getConnection } from "typeorm";
 import { Events } from "../database/entity/Events";
 import { User } from "../database/entity/User";
 import { Coupon } from "../database/entity/Coupon";
@@ -9,6 +9,7 @@ import { UserCoupon } from "../database/entity/UserCoupon";
 import { UserThumbs } from "../database/entity/UserThumbs";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
+import { UserThumbs } from "../database/entity/UserThumbs";
 
 enum couponState {
   enable,
@@ -240,5 +241,76 @@ export default class UserService {
     });
     comment.content = data.content;
     await getRepository(Comment).save(comment);
+  }
+
+  async addCommentService(data, info): Promise<void> {
+    const forInsertData = {
+      ...data, //content, eventId
+      userId: info.id
+    };
+    await getRepository(Comment).save(forInsertData);
+  }
+
+  async addThumbService(id, info): Promise<object> {
+    const comment = await getRepository(Comment).findOne({
+      where: {
+        id
+      }
+    });
+    comment.thumb++;
+    await getRepository(Comment).save(comment);
+
+    const forInsertData = {
+      userId: info.id,
+      commentId: id
+    };
+    await getRepository(UserThumbs).save(forInsertData);
+    return { commentId: id, thumb: comment.thumb };
+  }
+
+  async removeThumbService(id, info): Promise<object> {
+    const comment = await getRepository(Comment).findOne({
+      where: {
+        id
+      }
+    });
+    comment.thumb--;
+    await getRepository(Comment).save(comment);
+
+    await getConnection()
+      .createQueryBuilder()
+      .delete()
+      .from(UserThumbs)
+      .where({
+        userId: info.id,
+        commentId: id
+      })
+      .execute();
+
+    return { commentId: id, thumb: comment.thumb };
+  }
+
+  async getUserThumbsListService(url, info): Promise<void> {
+    //   // 받은 Url에 해당하는 이벤트를 찾고
+    //   const event = await getRepository(Events).findOne({
+    //     where: {
+    //       detailPageUrl: url
+    //     }
+    //   });
+    //   // 그 이벤트에 해당하는 모든 댓글을 찾고
+    //   const eventComment = await getRepository(Comment).find({
+    //     where: {
+    //       eventId: event.id
+    //     }
+    //   });
+    //   // // 그 댓글 중에서 유저가 좋아요 누른 댓글들을 찾음
+    //   // const userThumbsList = [];
+    //   // for (let i = 0; i < eventComment.length; i++) {
+    //   //   //
+    //   //   if (eventComment[i].userId === info.id) {
+    //   //     userThumbsList.push(eventComment[i].id);
+    //   //   }
+    //   // }
+    //   return { userThumbsList: userThumbsList };
   }
 }
