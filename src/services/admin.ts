@@ -5,6 +5,7 @@ import { Events } from "../database/entity/Events";
 import { Admin } from "../database/entity/Admin";
 import { Coupon } from "../database/entity/Coupon";
 import { UserCoupon } from "../database/entity/UserCoupon";
+import { User } from "../database/entity/User";
 import jwt from "jsonwebtoken";
 
 enum couponState {
@@ -217,5 +218,55 @@ export default class AdminService {
       return x;
     });
     await getRepository(UserCoupon).save(result2);
+  }
+
+  async getUserCouponListService(): Promise<object> {
+    const userCouponInfo = await getRepository(UserCoupon).find();
+    // console.log("userCouponInfo:", userCouponInfo);
+    const userInfo = await getRepository(User).find({
+      select: ["id", "name", "email"],
+      where: userCouponInfo.map(x => {
+        return {
+          id: x.userId
+        };
+      })
+    });
+    // console.log("userInfo:", userInfo);
+    const userInfoArr = [];
+    for (let i = 0; i < userCouponInfo.length; i++) {
+      for (let j = 0; j < userInfo.length; j++) {
+        if (userCouponInfo[i].userId === userInfo[j].id) {
+          userInfoArr.push({
+            name: userInfo[j].name,
+            email: userInfo[j].email
+          });
+        }
+      }
+    }
+    // console.log("userInfoArr:", userInfoArr);
+    const couponInfo = await getRepository(Coupon).find({
+      select: ["couponName", "couponCode"],
+      where: userCouponInfo.map(x => {
+        return {
+          id: x.couponId
+        };
+      })
+    });
+    // console.log("couponInfo:", couponInfo);
+    const result = [];
+    for (let i = 0; i < couponInfo.length; i++) {
+      // console.log("들어옴");
+      result.push({
+        userName: userInfoArr[i].name,
+        userEmail: userInfoArr[i].email,
+        couponName: couponInfo[i].couponName,
+        couponCode: couponInfo[i].couponCode,
+        assignedAt: userCouponInfo[i].createdAt,
+        isDeleted: userCouponInfo[i].isDeleted
+      });
+      // console.log(result);
+    }
+    // console.log("여기!!!!!!!!!!!!", result);
+    return { key: result };
   }
 }

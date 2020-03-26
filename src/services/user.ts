@@ -6,6 +6,7 @@ import { User } from "../database/entity/User";
 import { Coupon } from "../database/entity/Coupon";
 import { Comment } from "../database/entity/Comment";
 import { UserCoupon } from "../database/entity/UserCoupon";
+import { UserThumbs } from "../database/entity/UserThumbs";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 
@@ -88,7 +89,7 @@ export default class UserService {
       }
     });
     const userInfo = await getRepository(User).find({
-      select: ["name"],
+      select: ["id", "name"],
       where: commentListInfo.map(x => {
         return {
           id: x.userId
@@ -96,6 +97,7 @@ export default class UserService {
       })
     });
     for (let i = 0; i < userInfo.length; i++) {
+      commentListInfo[i]["userId"] = userInfo[i].id;
       commentListInfo[i]["userName"] = userInfo[i].name;
     }
     ////////////////////////////////////////////////
@@ -149,7 +151,7 @@ export default class UserService {
           expiresIn: "1h"
         }
       );
-      return { key: token };
+      return { key: token, id: result.id };
     } else {
       return { key: "unvalid user" };
     }
@@ -217,5 +219,26 @@ export default class UserService {
     };
     await getRepository(UserCoupon).save(forInsertData);
     return { key: "success" };
+  }
+
+  async deleteCommentService(commentId): Promise<void> {
+    const comment = await getRepository(Comment).findOne({
+      where: {
+        id: commentId
+      }
+    });
+    comment.isDeleted = true;
+    await getRepository(UserThumbs).delete({ commentId });
+    await getRepository(Comment).save(comment);
+  }
+
+  async updateCommentService(data, commentId): Promise<void> {
+    const comment = await getRepository(Comment).findOne({
+      where: {
+        id: commentId
+      }
+    });
+    comment.content = data.content;
+    await getRepository(Comment).save(comment);
   }
 }

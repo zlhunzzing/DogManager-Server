@@ -15,4 +15,8 @@ router.post("/coupon", controller.addCouponController);
 
 router.get("/coupon/list", controller.getCouponListController);
 
+router.get("/comment/entry/:commentId", controller.deleteCommentController);
+
+router.put("/comment/entry/:commentId", controller.updateCommentController);
+
 export default router;

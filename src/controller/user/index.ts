@@ -42,7 +42,7 @@ export default class UserController {
     if (result["key"] === "unvalid user") {
       res.status(409).send("unvalid user");
     } else {
-      res.status(200).json({ token: result["key"] });
+      res.status(200).json({ token: result["key"], userId: result["id"] });
     }
   }
 
@@ -75,6 +75,34 @@ export default class UserController {
       } else {
         res.status(409).send("duplicate");
       }
+    } catch (err) {
+      res.status(401).end();
+    }
+  }
+
+  async deleteCommentController(req: Request, res: Response): Promise<void> {
+    try {
+      const token = req.headers.authorization;
+      const userInfo = await verifyToken(
+        token,
+        process.env.JWT_USER_SECRET_KEY
+      );
+      await service.deleteCommentService(req.params.commentId);
+      res.status(200).end();
+    } catch (err) {
+      res.status(401).end();
+    }
+  }
+
+  async updateCommentController(req: Request, res: Response): Promise<void> {
+    try {
+      const token = req.headers.authorization;
+      const userInfo = await verifyToken(
+        token,
+        process.env.JWT_USER_SECRET_KEY
+      );
+      await service.updateCommentService(req.body, req.params.commentId);
+      res.status(200).end();
     } catch (err) {
       res.status(401).end();
     }

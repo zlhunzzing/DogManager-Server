@@ -187,4 +187,23 @@ export default class AdminController {
       res.status(401).end();
     }
   }
+
+  async getUserCouponListController(
+    req: Request,
+    res: Response
+  ): Promise<void> {
+    try {
+      const token = req.headers.authorization;
+      const userInfo = await verifyToken(
+        token,
+        process.env.JWT_ADMIN_SECRET_KEY
+      );
+      const result = await service.getUserCouponListService();
+      res.status(200).json({
+        couponList: result["key"]
+      });
+    } catch (err) {
+      res.status(401).end();
+    }
+  }
 }
