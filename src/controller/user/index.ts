@@ -79,4 +79,72 @@ export default class UserController {
       res.status(401).end();
     }
   }
+
+  async addCommentController(req: Request, res: Response): Promise<void> {
+    try {
+      const token = req.headers.authorization;
+      const userInfo = await verifyToken(
+        token,
+        process.env.JWT_USER_SECRET_KEY
+      );
+      await service.addCommentService(req.body, userInfo);
+      res.status(201).end();
+    } catch (err) {
+      res.status(401).end();
+    }
+  }
+
+  async addThumbController(req: Request, res: Response): Promise<void> {
+    try {
+      const token = req.headers.authorization;
+      const userInfo = await verifyToken(
+        token,
+        process.env.JWT_USER_SECRET_KEY
+      );
+      const result = await service.addThumbService(
+        req.params.commentId,
+        userInfo
+      );
+      res.status(200).json(result);
+    } catch (err) {
+      res.status(401).end();
+    }
+  }
+
+  async removeThumbController(req: Request, res: Response): Promise<void> {
+    try {
+      const token = req.headers.authorization;
+      const userInfo = await verifyToken(
+        token,
+        process.env.JWT_USER_SECRET_KEY
+      );
+      const result = await service.removeThumbService(
+        req.params.commentId,
+        userInfo
+      );
+      res.status(200).json(result);
+    } catch (err) {
+      res.status(401).end();
+    }
+  }
+
+  async getUserThumbsListController(
+    req: Request,
+    res: Response
+  ): Promise<void> {
+    try {
+      const token = req.headers.authorization;
+      const userInfo = await verifyToken(
+        token,
+        process.env.JWT_USER_SECRET_KEY
+      );
+      const result = await service.getUserThumbsListService(
+        req.params.eventUrl,
+        userInfo
+      );
+      res.status(200).json(result);
+    } catch (err) {
+      res.status(401).end();
+    }
+  }
 }

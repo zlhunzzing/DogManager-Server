@@ -15,4 +15,15 @@ router.post("/coupon", controller.addCouponController);
 
 router.get("/coupon/list", controller.getCouponListController);
 
+router.post("/comment/entry", controller.addCommentController);
+
+router.post("/comment/entry/thumb/:commentId", controller.addThumbController);
+
+router.delete(
+  "/comment/entry/thumb/:commentId",
+  controller.removeThumbController
+);
+
+router.get("/thumb/list/:eventUrl", controller.getUserThumbsListController);
+
 export default router;
