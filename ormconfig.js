@@ -9,7 +9,7 @@ module.exports = [
     username: process.env.DB_DEVELOPMENT_USERNAME,
     password: process.env.DB_DEVELOPMENT_PASSWORD,
     database: process.env.DB_DEVELOPMENT_DATABASE,
-    entities: ["src/entity/*.ts"],
+    entities: ["src/database/entity/*.ts"],
     logging: true,
     synchronize: true,
     seeds: ["src/database/seeds/**/*.seed.ts"],
@@ -23,7 +23,7 @@ module.exports = [
     username: process.env.DB_DEVELOPMENT_USERNAME,
     password: process.env.DB_DEVELOPMENT_PASSWORD,
     database: process.env.DB_TEST_DATABASE,
-    entities: ["src/entity/*.ts"],
+    entities: ["src/database/entity/*.ts"],
     logging: false,
     synchronize: true,
     dropSchema: true
@@ -36,7 +36,7 @@ module.exports = [
     username: process.env.DB_PRODUCTION_USERNAME,
     password: process.env.DB_PRODUCTION_PASSWORD,
     database: process.env.DB_PRODUCTION_DATABASE,
-    entities: ["dist/entity/*.js"],
+    entities: ["dist/database/entity/*.js"],
     logging: false,
     synchronize: true
   }

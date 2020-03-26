@@ -1,10 +1,10 @@
 import dotenv from "dotenv";
 dotenv.config();
 import { getRepository } from "typeorm";
-import { Events } from "../entity/Events";
-import { User } from "../entity/User";
-import { Coupon } from "../entity/Coupon";
-import { UserCoupon } from "../entity/UserCoupon";
+import { Events } from "../database/entity/Events";
+import { User } from "../database/entity/User";
+import { Coupon } from "../database/entity/Coupon";
+import { UserCoupon } from "../database/entity/UserCoupon";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 

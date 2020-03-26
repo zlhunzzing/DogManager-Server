@@ -7,11 +7,11 @@ import app from "../app";
 chai.use(chaiHttp);
 const expect = chai.expect;
 import { createTypeormConnection } from "../utils/createTypeormConnection";
-import { Events } from "../entity/Events";
-import { Admin } from "../entity/Admin";
-import { Coupon } from "../entity/Coupon";
-import { User } from "../entity/User";
-import { UserCoupon } from "../entity/UserCoupon";
+import { Events } from "../database/entity/Events";
+import { Admin } from "../database/entity/Admin";
+import { Coupon } from "../database/entity/Coupon";
+import { User } from "../database/entity/User";
+import { UserCoupon } from "../database/entity/UserCoupon";
 import { getRepository, getConnection, Repository } from "typeorm";
 import jwt from "jsonwebtoken";
 

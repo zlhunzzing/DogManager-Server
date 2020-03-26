@@ -1,10 +1,10 @@
 import dotenv from "dotenv";
 dotenv.config();
 import { getRepository } from "typeorm";
-import { Events } from "../entity/Events";
-import { Admin } from "../entity/Admin";
-import { Coupon } from "../entity/Coupon";
-import { UserCoupon } from "../entity/UserCoupon";
+import { Events } from "../database/entity/Events";
+import { Admin } from "../database/entity/Admin";
+import { Coupon } from "../database/entity/Coupon";
+import { UserCoupon } from "../database/entity/UserCoupon";
 import jwt from "jsonwebtoken";
 
 enum couponState {
