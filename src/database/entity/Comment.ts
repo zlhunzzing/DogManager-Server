@@ -20,7 +20,9 @@ export class Comment {
   @Column()
   eventId: number;
 
-  @Column()
+  @Column({
+    default: 0
+  })
   thumb: number;
 
   @Column({
