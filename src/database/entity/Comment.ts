@@ -7,24 +7,27 @@ import {
 } from "typeorm";
 
 @Entity()
-export class User {
+export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  name: string;
+  content: string;
 
   @Column()
-  email: string;
+  userId: number;
 
   @Column()
-  password: string;
+  eventId: number;
 
   @Column()
-  mobile: string;
+  thumb: number;
 
-  @Column()
-  address: string;
+  @Column({
+    type: "boolean",
+    default: false
+  })
+  isDeleted: boolean;
 
   @CreateDateColumn()
   createdAt: string;

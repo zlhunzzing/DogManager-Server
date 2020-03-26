@@ -4,6 +4,7 @@ import { getRepository } from "typeorm";
 import { Events } from "../database/entity/Events";
 import { User } from "../database/entity/User";
 import { Coupon } from "../database/entity/Coupon";
+import { Comment } from "../database/entity/Comment";
 import { UserCoupon } from "../database/entity/UserCoupon";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
@@ -78,9 +79,30 @@ export default class UserService {
         couponCode: eventInfo.couponCode ? eventInfo.couponCode : null
       }
     });
+
+    ////////////////////////////////////////////////
+    const commentListInfo = await getRepository(Comment).find({
+      select: ["id", "userId", "content", "createdAt", "thumb"],
+      where: {
+        eventId: eventInfo.id
+      }
+    });
+    const userInfo = await getRepository(User).find({
+      select: ["name"],
+      where: commentListInfo.map(x => {
+        return {
+          id: x.userId
+        };
+      })
+    });
+    for (let i = 0; i < userInfo.length; i++) {
+      commentListInfo[i]["userName"] = userInfo[i].name;
+    }
+    ////////////////////////////////////////////////
     const result = {
       ...eventInfo,
-      period: couponInfo ? couponInfo.period : null
+      period: couponInfo ? couponInfo.period : null,
+      commentList: commentListInfo
     };
     return result;
   }
