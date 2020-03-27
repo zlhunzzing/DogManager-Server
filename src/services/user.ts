@@ -363,10 +363,10 @@ export default class UserService {
     return { commentList: commentListInfo };
   }
 
-  async addThumbService(id, info): Promise<object> {
+  async addThumbService(commentId, info): Promise<object> {
     const comment = await getRepository(Comment).findOne({
       where: {
-        id
+        id: commentId
       }
     });
     comment.thumb++;
@@ -374,16 +374,63 @@ export default class UserService {
 
     const forInsertData = {
       userId: info.id,
-      commentId: id
+      commentId
     };
     await getRepository(UserThumbs).save(forInsertData);
-    return { commentId: id, thumb: comment.thumb };
+
+    const commentEvent = await getRepository(Comment).findOne({
+      select: ["eventId"],
+      where: {
+        id: commentId
+      }
+    });
+
+    const eventInfo = await getRepository(Events).findOne({
+      where: {
+        id: commentEvent.eventId,
+        isDeleted: false
+      }
+    });
+
+    const commentInfo = await getRepository(Comment).find({
+      select: ["id", "userId", "content", "createdAt", "thumb", "isDeleted"],
+      where: {
+        eventId: eventInfo.id,
+        isDeleted: false
+      }
+    });
+    const userInfo = await getRepository(User).find({
+      select: ["id", "name"],
+      where: commentInfo.map(x => {
+        return {
+          id: x.userId
+        };
+      })
+    });
+    const commentListInfo = commentInfo.map(x => {
+      const filteredUserInfo = userInfo.filter(y => {
+        return y.id === x.userId;
+      });
+      const time = new Date(x.createdAt.toString());
+      const timeData = getTime(time);
+      return {
+        id: x.id,
+        content: x.content,
+        userId: filteredUserInfo[0].id,
+        thumb: x.thumb,
+        isDeleted: x.isDeleted,
+        createdAt: timeData,
+        userName: filteredUserInfo[0].name
+      };
+    });
+
+    return { commentId, thumb: comment.thumb, commentList: commentListInfo };
   }
 
-  async removeThumbService(id, info): Promise<object> {
+  async removeThumbService(commentId, info): Promise<object> {
     const comment = await getRepository(Comment).findOne({
       where: {
-        id
+        id: commentId
       }
     });
     comment.thumb--;
@@ -391,9 +438,56 @@ export default class UserService {
 
     await getRepository(UserThumbs).delete({
       userId: info.id,
-      commentId: Number(id)
+      commentId: Number(commentId)
     });
-    return { commentId: id, thumb: comment.thumb };
+
+    const commentEvent = await getRepository(Comment).findOne({
+      select: ["eventId"],
+      where: {
+        id: commentId
+      }
+    });
+
+    const eventInfo = await getRepository(Events).findOne({
+      where: {
+        id: commentEvent.eventId,
+        isDeleted: false
+      }
+    });
+
+    const commentInfo = await getRepository(Comment).find({
+      select: ["id", "userId", "content", "createdAt", "thumb", "isDeleted"],
+      where: {
+        eventId: eventInfo.id,
+        isDeleted: false
+      }
+    });
+    const userInfo = await getRepository(User).find({
+      select: ["id", "name"],
+      where: commentInfo.map(x => {
+        return {
+          id: x.userId
+        };
+      })
+    });
+    const commentListInfo = commentInfo.map(x => {
+      const filteredUserInfo = userInfo.filter(y => {
+        return y.id === x.userId;
+      });
+      const time = new Date(x.createdAt.toString());
+      const timeData = getTime(time);
+      return {
+        id: x.id,
+        content: x.content,
+        userId: filteredUserInfo[0].id,
+        thumb: x.thumb,
+        isDeleted: x.isDeleted,
+        createdAt: timeData,
+        userName: filteredUserInfo[0].name
+      };
+    });
+
+    return { commentId, thumb: comment.thumb, commentList: commentListInfo };
   }
 
   async getUserThumbsListService(url, info): Promise<object> {
@@ -416,6 +510,10 @@ export default class UserService {
         };
       })
     });
-    return { userThumbsList: commentIdList };
+    const commentIdArr = [];
+    for (let i = 0; i < commentIdList.length; i++) {
+      commentIdArr.push(commentIdList[i].commentId);
+    }
+    return { userThumbsList: commentIdArr };
   }
 }
