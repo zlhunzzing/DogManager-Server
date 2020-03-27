@@ -87,8 +87,8 @@ export default class UserController {
         token,
         process.env.JWT_USER_SECRET_KEY
       );
-      await service.deleteCommentService(req.params.commentId);
-      res.status(200).end();
+      const result = await service.deleteCommentService(req.params.commentId);
+      res.status(200).json(result);
     } catch (err) {
       res.status(401).end();
     }
@@ -101,8 +101,8 @@ export default class UserController {
         token,
         process.env.JWT_USER_SECRET_KEY
       );
-      await service.addCommentService(req.body, userInfo);
-      res.status(201).end();
+      const result = await service.addCommentService(req.body, userInfo);
+      res.status(201).json(result);
     } catch (err) {
       res.status(401).end();
     }
