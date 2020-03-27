@@ -35,6 +35,17 @@ interface CouponData {
   discount: string;
 }
 
+const getTime = time => {
+  const year = time.getFullYear();
+  let month = (time.getMonth() + 1).toString();
+  month = Number(month) < 10 ? "0" + month : month;
+  const date = time.getDate();
+  const hour = time.getHours();
+  const minute = time.getMinutes();
+  const result2 = "" + year + month + date + hour + minute;
+  return result2;
+};
+
 export default class AdminService {
   async addEventService(data: EventData): Promise<object> {
     const inData = await getRepository(Events).findOne({
@@ -222,7 +233,7 @@ export default class AdminService {
 
   async getUserCouponListService(): Promise<object> {
     const userCouponInfo = await getRepository(UserCoupon).find();
-    // console.log("userCouponInfo:", userCouponInfo);
+
     const userInfo = await getRepository(User).find({
       select: ["id", "name", "email"],
       where: userCouponInfo.map(x => {
@@ -231,42 +242,38 @@ export default class AdminService {
         };
       })
     });
-    // console.log("userInfo:", userInfo);
-    const userInfoArr = [];
-    for (let i = 0; i < userCouponInfo.length; i++) {
-      for (let j = 0; j < userInfo.length; j++) {
-        if (userCouponInfo[i].userId === userInfo[j].id) {
-          userInfoArr.push({
-            name: userInfo[j].name,
-            email: userInfo[j].email
-          });
-        }
-      }
-    }
-    // console.log("userInfoArr:", userInfoArr);
+
     const couponInfo = await getRepository(Coupon).find({
-      select: ["couponName", "couponCode"],
+      select: ["id", "couponName", "couponCode"],
       where: userCouponInfo.map(x => {
         return {
           id: x.couponId
         };
       })
     });
-    // console.log("couponInfo:", couponInfo);
-    const result = [];
-    for (let i = 0; i < couponInfo.length; i++) {
-      // console.log("들어옴");
-      result.push({
-        userName: userInfoArr[i].name,
-        userEmail: userInfoArr[i].email,
-        couponName: couponInfo[i].couponName,
-        couponCode: couponInfo[i].couponCode,
-        assignedAt: userCouponInfo[i].createdAt,
-        isDeleted: userCouponInfo[i].isDeleted
+    /////////////////////
+
+    const result = userCouponInfo.map(x => {
+      const filteredUserInfo = userInfo.filter(y => {
+        return y.id === x.userId;
       });
-      // console.log(result);
-    }
-    // console.log("여기!!!!!!!!!!!!", result);
+      const filteredCouponInfo = couponInfo.filter(y => {
+        return y.id === x.couponId;
+      });
+
+      const time = new Date(x.createdAt.toString());
+      const timeData = getTime(time);
+
+      return {
+        userName: filteredUserInfo[0].name,
+        userEmail: filteredUserInfo[0].email,
+        couponName: filteredCouponInfo[0].couponName,
+        couponCode: filteredCouponInfo[0].couponCode,
+        assignedAt: timeData,
+        expiredAt: x.expiredAt,
+        isDeletedAt: x.isDeleted
+      };
+    });
     return { key: result };
   }
 }

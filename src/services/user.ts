@@ -9,7 +9,6 @@ import { UserCoupon } from "../database/entity/UserCoupon";
 import { UserThumbs } from "../database/entity/UserThumbs";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
-import { UserThumbs } from "../database/entity/UserThumbs";
 
 enum couponState {
   enable,
@@ -70,12 +69,14 @@ export default class UserService {
   }
 
   async getEventEntryService(url: string): Promise<object> {
+    console.log(url);
     const eventInfo = await getRepository(Events).findOne({
       where: {
         detailPageUrl: `/${url}`,
         isDeleted: false
       }
     });
+    console.log(eventInfo);
     const couponInfo = await getRepository(Coupon).findOne({
       where: {
         couponCode: eventInfo.couponCode ? eventInfo.couponCode : null
@@ -84,9 +85,10 @@ export default class UserService {
 
     ////////////////////////////////////////////////
     const commentListInfo = await getRepository(Comment).find({
-      select: ["id", "userId", "content", "createdAt", "thumb"],
+      select: ["id", "userId", "content", "createdAt", "thumb", "isDeleted"],
       where: {
-        eventId: eventInfo.id
+        eventId: eventInfo.id,
+        isDeleted: false
       }
     });
     const userInfo = await getRepository(User).find({
@@ -107,6 +109,13 @@ export default class UserService {
       period: couponInfo ? couponInfo.period : null,
       commentList: commentListInfo
     };
+    // for (let i = 0; i < result.commentList.length; i++) {
+    //   if (result.commentList[i].isDeleted === true) {
+    //     result.commentList.splice(i, 1);
+    //     i--;
+    //   }
+    // }
+    /////////////////////////////////////////////////////////////
     return result;
   }
 
@@ -245,7 +254,7 @@ export default class UserService {
 
   async addCommentService(data, info): Promise<void> {
     const forInsertData = {
-      ...data, //content, eventId
+      ...data, // content, eventId
       userId: info.id
     };
     await getRepository(Comment).save(forInsertData);
@@ -277,40 +286,36 @@ export default class UserService {
     comment.thumb--;
     await getRepository(Comment).save(comment);
 
-    await getConnection()
-      .createQueryBuilder()
-      .delete()
-      .from(UserThumbs)
-      .where({
-        userId: info.id,
-        commentId: id
-      })
-      .execute();
-
+    await getRepository(UserThumbs).delete({
+      userId: info.id,
+      commentId: Number(id)
+    });
     return { commentId: id, thumb: comment.thumb };
   }
 
-  async getUserThumbsListService(url, info): Promise<void> {
-    //   // 받은 Url에 해당하는 이벤트를 찾고
-    //   const event = await getRepository(Events).findOne({
-    //     where: {
-    //       detailPageUrl: url
-    //     }
-    //   });
-    //   // 그 이벤트에 해당하는 모든 댓글을 찾고
-    //   const eventComment = await getRepository(Comment).find({
-    //     where: {
-    //       eventId: event.id
-    //     }
-    //   });
-    //   // // 그 댓글 중에서 유저가 좋아요 누른 댓글들을 찾음
-    //   // const userThumbsList = [];
-    //   // for (let i = 0; i < eventComment.length; i++) {
-    //   //   //
-    //   //   if (eventComment[i].userId === info.id) {
-    //   //     userThumbsList.push(eventComment[i].id);
-    //   //   }
-    //   // }
-    //   return { userThumbsList: userThumbsList };
+  async getUserThumbsListService(url, info): Promise<object> {
+    const event = await getRepository(Events).findOne({
+      where: {
+        detailPageUrl: `/${url}`
+      }
+    });
+    console.log("event:", event);
+    const commentList = await getRepository(Comment).find({
+      where: {
+        eventId: event.id
+      }
+    });
+    console.log("commentList:", commentList);
+    const commentIdList = await getRepository(UserThumbs).find({
+      select: ["commentId"],
+      where: commentList.map(x => {
+        return {
+          commentId: x.id,
+          userId: info.id
+        };
+      })
+    });
+    console.log("commentIdList:", commentIdList);
+    return { userThumbsList: commentIdList };
   }
 }

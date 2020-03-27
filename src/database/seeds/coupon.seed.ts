@@ -18,6 +18,13 @@ export default class CreateUsers implements Seeder {
         description: "this is second coupon",
         period: 7,
         discount: "20%"
+      },
+      {
+        couponName: "third coupon",
+        couponCode: "@third",
+        description: "this is second coupon",
+        period: 7,
+        discount: "30%"
       }
     ];
     await connection.getRepository(Coupon).save(couponData);
