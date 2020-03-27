@@ -10,7 +10,7 @@ module.exports = [
     password: process.env.DB_DEVELOPMENT_PASSWORD,
     database: process.env.DB_DEVELOPMENT_DATABASE,
     entities: ["src/database/entity/*.ts"],
-    logging: true,
+    logging: false,
     synchronize: true,
     seeds: ["src/database/seeds/**/*.seed.ts"],
     factories: ["src/database/factories/**/*.factory.ts"]

@@ -15,6 +15,10 @@ router.post("/coupon", controller.addCouponController);
 
 router.get("/coupon/list", controller.getCouponListController);
 
+router.delete("/comment/entry/:commentId", controller.deleteCommentController);
+
+router.put("/comment/entry/:commentId", controller.updateCommentController);
+
 router.post("/comment/entry", controller.addCommentController);
 
 router.post("/comment/entry/thumb/:commentId", controller.addThumbController);

@@ -5,6 +5,7 @@ import { Events } from "../database/entity/Events";
 import { Admin } from "../database/entity/Admin";
 import { Coupon } from "../database/entity/Coupon";
 import { UserCoupon } from "../database/entity/UserCoupon";
+import { User } from "../database/entity/User";
 import jwt from "jsonwebtoken";
 
 enum couponState {
@@ -33,6 +34,17 @@ interface CouponData {
   period: number;
   discount: string;
 }
+
+const getTime = time => {
+  const year = time.getFullYear();
+  let month = (time.getMonth() + 1).toString();
+  month = Number(month) < 10 ? "0" + month : month;
+  const date = time.getDate();
+  const hour = time.getHours();
+  const minute = time.getMinutes();
+  const result2 = "" + year + month + date + hour + minute;
+  return result2;
+};
 
 export default class AdminService {
   async addEventService(data: EventData): Promise<object> {
@@ -217,5 +229,51 @@ export default class AdminService {
       return x;
     });
     await getRepository(UserCoupon).save(result2);
+  }
+
+  async getUserCouponListService(): Promise<object> {
+    const userCouponInfo = await getRepository(UserCoupon).find();
+
+    const userInfo = await getRepository(User).find({
+      select: ["id", "name", "email"],
+      where: userCouponInfo.map(x => {
+        return {
+          id: x.userId
+        };
+      })
+    });
+
+    const couponInfo = await getRepository(Coupon).find({
+      select: ["id", "couponName", "couponCode"],
+      where: userCouponInfo.map(x => {
+        return {
+          id: x.couponId
+        };
+      })
+    });
+    /////////////////////
+
+    const result = userCouponInfo.map(x => {
+      const filteredUserInfo = userInfo.filter(y => {
+        return y.id === x.userId;
+      });
+      const filteredCouponInfo = couponInfo.filter(y => {
+        return y.id === x.couponId;
+      });
+
+      const time = new Date(x.createdAt.toString());
+      const timeData = getTime(time);
+
+      return {
+        userName: filteredUserInfo[0].name,
+        userEmail: filteredUserInfo[0].email,
+        couponName: filteredCouponInfo[0].couponName,
+        couponCode: filteredCouponInfo[0].couponCode,
+        assignedAt: timeData,
+        expiredAt: x.expiredAt,
+        isDeletedAt: x.isDeleted
+      };
+    });
+    return { key: result };
   }
 }

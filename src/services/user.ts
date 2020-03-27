@@ -6,9 +6,9 @@ import { User } from "../database/entity/User";
 import { Coupon } from "../database/entity/Coupon";
 import { Comment } from "../database/entity/Comment";
 import { UserCoupon } from "../database/entity/UserCoupon";
+import { UserThumbs } from "../database/entity/UserThumbs";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
-import { UserThumbs } from "../database/entity/UserThumbs";
 
 enum couponState {
   enable,
@@ -39,6 +39,17 @@ const getRecentTime = () => {
   const minute = now.getMinutes();
   const result = "" + year + month + date + hour + minute;
   return result;
+};
+
+const getTime = time => {
+  const year = time.getFullYear();
+  let month = (time.getMonth() + 1).toString();
+  month = Number(month) < 10 ? "0" + month : month;
+  const date = time.getDate();
+  const hour = time.getHours();
+  const minute = time.getMinutes();
+  const result2 = "" + year + month + date + hour + minute;
+  return result2;
 };
 
 interface CouponData {
@@ -75,31 +86,45 @@ export default class UserService {
         isDeleted: false
       }
     });
+
     const couponInfo = await getRepository(Coupon).findOne({
       where: {
         couponCode: eventInfo.couponCode ? eventInfo.couponCode : null
       }
     });
 
-    ////////////////////////////////////////////////
-    const commentListInfo = await getRepository(Comment).find({
-      select: ["id", "userId", "content", "createdAt", "thumb"],
+    const commentInfo = await getRepository(Comment).find({
+      select: ["id", "userId", "content", "createdAt", "thumb", "isDeleted"],
       where: {
-        eventId: eventInfo.id
+        eventId: eventInfo.id,
+        isDeleted: false
       }
     });
     const userInfo = await getRepository(User).find({
-      select: ["name"],
-      where: commentListInfo.map(x => {
+      select: ["id", "name"],
+      where: commentInfo.map(x => {
         return {
           id: x.userId
         };
       })
     });
-    for (let i = 0; i < userInfo.length; i++) {
-      commentListInfo[i]["userName"] = userInfo[i].name;
-    }
-    ////////////////////////////////////////////////
+    const commentListInfo = commentInfo.map(x => {
+      const filteredUserInfo = userInfo.filter(y => {
+        return y.id === x.userId;
+      });
+      const time = new Date(x.createdAt.toString());
+      const timeData = getTime(time);
+      return {
+        id: x.id,
+        content: x.content,
+        userId: filteredUserInfo[0].id,
+        thumb: x.thumb,
+        isDeleted: x.isDeleted,
+        createdAt: timeData,
+        userName: filteredUserInfo[0].name
+      };
+    });
+
     const result = {
       ...eventInfo,
       period: couponInfo ? couponInfo.period : null,
@@ -150,7 +175,7 @@ export default class UserService {
           expiresIn: "1h"
         }
       );
-      return { key: token };
+      return { key: token, id: result.id };
     } else {
       return { key: "unvalid user" };
     }
@@ -220,12 +245,122 @@ export default class UserService {
     return { key: "success" };
   }
 
-  async addCommentService(data, info): Promise<void> {
+  async deleteCommentService(commentId): Promise<object> {
+    const comment = await getRepository(Comment).findOne({
+      where: {
+        id: commentId
+      }
+    });
+    comment.isDeleted = true;
+    await getRepository(UserThumbs).delete({ commentId });
+    await getRepository(Comment).save(comment);
+
+    const commentEvent = await getRepository(Comment).findOne({
+      select: ["eventId"],
+      where: {
+        id: commentId
+      }
+    });
+
+    const eventInfo = await getRepository(Events).findOne({
+      where: {
+        id: commentEvent.eventId,
+        isDeleted: false
+      }
+    });
+
+    const commentInfo = await getRepository(Comment).find({
+      select: ["id", "userId", "content", "createdAt", "thumb", "isDeleted"],
+      where: {
+        eventId: eventInfo.id,
+        isDeleted: false
+      }
+    });
+    const userInfo = await getRepository(User).find({
+      select: ["id", "name"],
+      where: commentInfo.map(x => {
+        return {
+          id: x.userId
+        };
+      })
+    });
+    const commentListInfo = commentInfo.map(x => {
+      const filteredUserInfo = userInfo.filter(y => {
+        return y.id === x.userId;
+      });
+      const time = new Date(x.createdAt.toString());
+      const timeData = getTime(time);
+      return {
+        id: x.id,
+        content: x.content,
+        userId: filteredUserInfo[0].id,
+        thumb: x.thumb,
+        isDeleted: x.isDeleted,
+        createdAt: timeData,
+        userName: filteredUserInfo[0].name
+      };
+    });
+
+    return { commentList: commentListInfo };
+  }
+
+  async updateCommentService(data, commentId): Promise<void> {
+    const comment = await getRepository(Comment).findOne({
+      where: {
+        id: commentId
+      }
+    });
+    comment.content = data.content;
+    await getRepository(Comment).save(comment);
+  }
+
+  async addCommentService(data, info): Promise<object> {
     const forInsertData = {
-      ...data, //content, eventId
+      ...data,
       userId: info.id
     };
     await getRepository(Comment).save(forInsertData);
+
+    const eventInfo = await getRepository(Events).findOne({
+      where: {
+        id: data.eventId,
+        isDeleted: false
+      }
+    });
+
+    const commentInfo = await getRepository(Comment).find({
+      select: ["id", "userId", "content", "createdAt", "thumb", "isDeleted"],
+      where: {
+        eventId: eventInfo.id,
+        isDeleted: false
+      }
+    });
+    const userInfo = await getRepository(User).find({
+      select: ["id", "name"],
+      where: commentInfo.map(x => {
+        return {
+          id: x.userId
+        };
+      })
+    });
+    const commentListInfo = commentInfo.map(x => {
+      const filteredUserInfo = userInfo.filter(y => {
+        return y.id === x.userId;
+      });
+      const time = new Date(x.createdAt.toString());
+      const timeData = getTime(time);
+      return {
+        id: x.id,
+        content: x.content,
+        userId: filteredUserInfo[0].id,
+        thumb: x.thumb,
+        isDeleted: x.isDeleted,
+        createdAt: timeData,
+        userName: filteredUserInfo[0].name
+      };
+    });
+
+    return { commentList: commentListInfo };
   }
 
   async addThumbService(id, info): Promise<object> {
@@ -254,47 +389,33 @@ export default class UserService {
     comment.thumb--;
     await getRepository(Comment).save(comment);
 
-    await getConnection()
-      .createQueryBuilder()
-      .delete()
-      .from(UserThumbs)
-      .where({
-        userId: info.id,
-        commentId: id
-      })
-      .execute();
-
+    await getRepository(UserThumbs).delete({
+      userId: info.id,
+      commentId: Number(id)
+    });
     return { commentId: id, thumb: comment.thumb };
   }
 
   async getUserThumbsListService(url, info): Promise<object> {
-    // 받은 Url에 해당하는 이벤트를 찾고
     const event = await getRepository(Events).findOne({
       where: {
-        detailPageUrl: url
+        detailPageUrl: `/${url}`
       }
     });
-    // 그 이벤트에 해당하는 모든 댓글을 찾고
-    const eventComment = await getRepository(Comment).find({
+    const commentList = await getRepository(Comment).find({
       where: {
         eventId: event.id
       }
     });
-    console.log(eventComment);
-    // 그 댓글 중에서 유저가 좋아요 누른 댓글들을 찾음
-    const thumbs = await getRepository(UserThumbs).find({
-      where: {
-        userId: info.id
-      }
+    const commentIdList = await getRepository(UserThumbs).find({
+      select: ["commentId"],
+      where: commentList.map(x => {
+        return {
+          commentId: x.id,
+          userId: info.id
+        };
+      })
     });
-    const userThumbsList = [];
-    for (let i = 0; i < eventComment.length; i++) {
-      for (let n = 0; n < thumbs.length; n++) {
-        if (eventComment[i]["id"] === thumbs[n]["commentId"]) {
-          userThumbsList.push(thumbs[n]["commentId"]);
-        }
-      }
-    }
-    return { userThumbsList: userThumbsList };
+    return { userThumbsList: commentIdList };
   }
 }

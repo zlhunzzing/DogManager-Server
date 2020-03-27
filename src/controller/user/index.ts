@@ -42,7 +42,7 @@ export default class UserController {
     if (result["key"] === "unvalid user") {
       res.status(409).send("unvalid user");
     } else {
-      res.status(200).json({ token: result["key"] });
+      res.status(200).json({ token: result["key"], userId: result["id"] });
     }
   }
 
@@ -80,6 +80,20 @@ export default class UserController {
     }
   }
 
+  async deleteCommentController(req: Request, res: Response): Promise<void> {
+    try {
+      const token = req.headers.authorization;
+      const userInfo = await verifyToken(
+        token,
+        process.env.JWT_USER_SECRET_KEY
+      );
+      const result = await service.deleteCommentService(req.params.commentId);
+      res.status(200).json(result);
+    } catch (err) {
+      res.status(401).end();
+    }
+  }
+
   async addCommentController(req: Request, res: Response): Promise<void> {
     try {
       const token = req.headers.authorization;
@@ -87,8 +101,22 @@ export default class UserController {
         token,
         process.env.JWT_USER_SECRET_KEY
       );
-      await service.addCommentService(req.body, userInfo);
-      res.status(201).end();
+      const result = await service.addCommentService(req.body, userInfo);
+      res.status(201).json(result);
+    } catch (err) {
+      res.status(401).end();
+    }
+  }
+
+  async updateCommentController(req: Request, res: Response): Promise<void> {
+    try {
+      const token = req.headers.authorization;
+      const userInfo = await verifyToken(
+        token,
+        process.env.JWT_USER_SECRET_KEY
+      );
+      await service.updateCommentService(req.body, req.params.commentId);
+      res.status(200).end();
     } catch (err) {
       res.status(401).end();
     }
