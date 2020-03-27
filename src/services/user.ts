@@ -267,27 +267,34 @@ export default class UserService {
     return { commentId: id, thumb: comment.thumb };
   }
 
-  async getUserThumbsListService(url, info): Promise<void> {
-    //   // 받은 Url에 해당하는 이벤트를 찾고
-    //   const event = await getRepository(Events).findOne({
-    //     where: {
-    //       detailPageUrl: url
-    //     }
-    //   });
-    //   // 그 이벤트에 해당하는 모든 댓글을 찾고
-    //   const eventComment = await getRepository(Comment).find({
-    //     where: {
-    //       eventId: event.id
-    //     }
-    //   });
-    //   // // 그 댓글 중에서 유저가 좋아요 누른 댓글들을 찾음
-    //   // const userThumbsList = [];
-    //   // for (let i = 0; i < eventComment.length; i++) {
-    //   //   //
-    //   //   if (eventComment[i].userId === info.id) {
-    //   //     userThumbsList.push(eventComment[i].id);
-    //   //   }
-    //   // }
-    //   return { userThumbsList: userThumbsList };
+  async getUserThumbsListService(url, info): Promise<object> {
+    // 받은 Url에 해당하는 이벤트를 찾고
+    const event = await getRepository(Events).findOne({
+      where: {
+        detailPageUrl: url
+      }
+    });
+    // 그 이벤트에 해당하는 모든 댓글을 찾고
+    const eventComment = await getRepository(Comment).find({
+      where: {
+        eventId: event.id
+      }
+    });
+    console.log(eventComment);
+    // 그 댓글 중에서 유저가 좋아요 누른 댓글들을 찾음
+    const thumbs = await getRepository(UserThumbs).find({
+      where: {
+        userId: info.id
+      }
+    });
+    const userThumbsList = [];
+    for (let i = 0; i < eventComment.length; i++) {
+      for (let n = 0; n < thumbs.length; n++) {
+        if (eventComment[i]["id"] === thumbs[n]["commentId"]) {
+          userThumbsList.push(thumbs[n]["commentId"]);
+        }
+      }
+    }
+    return { userThumbsList: userThumbsList };
   }
 }
