@@ -18,13 +18,13 @@ export default class AdminController {
     req: any & { files: MulterFile[] },
     res: Response
   ): Promise<void> {
-    const data = req.body;
+    const eventData = req.body;
     if (req.files["pageImage"]) {
-      data.pageImage = req.files["pageImage"][0].location;
-      data.bannerImage = req.files["bannerImage"][0].location;
-      data.buttonImage = req.files["buttonImage"][0].location;
+      eventData.pageImage = req.files["pageImage"][0].location;
+      eventData.bannerImage = req.files["bannerImage"][0].location;
+      eventData.buttonImage = req.files["buttonImage"][0].location;
     }
-    const result = await service.addEventService(data);
+    const result = await service.addEventService(eventData);
     if (result["key"] === "detailPageUrl") {
       res.status(409).send("detailPageUrl");
     } else {
@@ -36,17 +36,17 @@ export default class AdminController {
     req: Request & { files: MulterFile[] },
     res: Response
   ): Promise<void> {
-    const data = req.body;
+    const eventData = req.body;
     if (req.files["pageImage"]) {
-      data.pageImage = req.files["pageImage"][0].location;
+      eventData.pageImage = req.files["pageImage"][0].location;
     }
     if (req.files["bannerImage"]) {
-      data.bannerImage = req.files["bannerImage"][0].location;
+      eventData.bannerImage = req.files["bannerImage"][0].location;
     }
     if (req.files["buttonImage"]) {
-      data.buttonImage = req.files["buttonImage"][0].location;
+      eventData.buttonImage = req.files["buttonImage"][0].location;
     }
-    const result = await service.putEventService(data, req.params.id);
+    const result = await service.putEventService(eventData, req.params.eventId);
     if (result["key"] === "detailPageUrl") {
       res.status(409).send("detailPageUrl");
     } else {
@@ -60,15 +60,12 @@ export default class AdminController {
   }
 
   async getEventEntryController(req: Request, res: Response): Promise<void> {
-    const result = await service.getEventEntryService(
-      req.params.id,
-      req.body.couponCode
-    );
+    const result = await service.getEventEntryService(req.params.eventId);
     res.status(200).json(result);
   }
 
   async deleteEventController(req: Request, res: Response): Promise<void> {
-    await service.deleteEventService(req.params.id);
+    await service.deleteEventService(req.params.eventId);
     res.status(200).end();
   }
 
@@ -101,7 +98,7 @@ export default class AdminController {
   }
 
   async deleteCouponController(req: Request, res: Response): Promise<void> {
-    await service.deleteCouponService(req.params.id);
+    await service.deleteCouponService(req.params.couponId);
     res.status(200).end();
   }
 

@@ -7,7 +7,7 @@ const jwtCheck = jwtMiddleware(process.env.JWT_SECRET_KEY);
 
 router.get("/events/list", controller.getEventListController);
 
-router.get("/events/entry/:url", controller.getEventEntryController);
+router.get("/events/entry/:eventUrl", controller.getEventEntryController);
 
 router.post("/signup", controller.signupController);
 

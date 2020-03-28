@@ -185,10 +185,10 @@ export default class UserService {
     return result;
   }
 
-  async getEventEntryService(url: string): Promise<object> {
+  async getEventEntryService(eventUrl: string): Promise<object> {
     const eventInfo = await getRepository(Events).findOne({
       where: {
-        detailPageUrl: `/${url}`,
+        detailPageUrl: `/${eventUrl}`,
         isDeleted: false
       }
     });
@@ -199,7 +199,7 @@ export default class UserService {
       }
     });
 
-    const commentListInfo = await makeCommentList(url, null);
+    const commentListInfo = await makeCommentList(eventUrl, null);
 
     const result = {
       ...eventInfo,
@@ -209,35 +209,35 @@ export default class UserService {
     return result;
   }
 
-  async signupService(data: SignupData): Promise<object> {
+  async signupService(userInfo: SignupData): Promise<object> {
     const result = await getRepository(User).findOne({
       where: {
-        email: data.email
+        email: userInfo.email
       }
     });
     if (result) {
       return { key: "already exist" };
     }
     const shasum = crypto.createHmac("sha512", process.env.CRYPTO_SECRET_KEY);
-    shasum.update(data.password);
-    data.password = shasum.digest("hex");
+    shasum.update(userInfo.password);
+    userInfo.password = shasum.digest("hex");
     const user = new User();
     const forInsertData = {
       ...user,
-      ...data
+      ...userInfo
     };
     await getRepository(User).save(forInsertData);
     return { key: "completed" };
   }
 
-  async signinService(data: SigninData): Promise<object> {
+  async signinService(userInfo: SigninData): Promise<object> {
     const shasum = crypto.createHmac("sha512", process.env.CRYPTO_SECRET_KEY);
-    shasum.update(data.password);
-    data.password = shasum.digest("hex");
+    shasum.update(userInfo.password);
+    userInfo.password = shasum.digest("hex");
     const result = await getRepository(User).findOne({
       where: {
-        email: data.email,
-        password: data.password
+        email: userInfo.email,
+        password: userInfo.password
       }
     });
     if (result) {
@@ -294,17 +294,17 @@ export default class UserService {
     }
     return result;
   }
-  async addCouponService(data: CouponData, info): Promise<object> {
+  async addCouponService(couponData: CouponData, tokenInfo): Promise<object> {
     // // 해당 이벤트의 쿠폰정보를 조회
     const coupon = await getRepository(Coupon).findOne({
       where: {
-        couponCode: data.couponCode
+        couponCode: couponData.couponCode
       }
     });
     // // 조회한 쿠폰을 이미 가지고 있을 경우 중복처리
     const inData = await getRepository(UserCoupon).findOne({
       where: {
-        userId: info.id,
+        userId: tokenInfo.id,
         couponId: coupon.id
       }
     });
@@ -314,8 +314,8 @@ export default class UserService {
     // 쿠폰을 생성
     const forInsertData = {
       couponId: coupon.id,
-      userId: info.id,
-      expiredAt: data.expiredAt
+      userId: tokenInfo.id,
+      expiredAt: couponData.expiredAt
     };
     await getRepository(UserCoupon).save(forInsertData);
     return { key: "success" };
@@ -336,26 +336,26 @@ export default class UserService {
     return { commentList: commentListInfo };
   }
 
-  async updateCommentService(data, commentId): Promise<void> {
+  async updateCommentService(commentData, commentId): Promise<void> {
     const comment = await getRepository(Comment).findOne({
       where: {
         id: commentId
       }
     });
-    comment.content = data.content;
+    comment.content = commentData.content;
     await getRepository(Comment).save(comment);
   }
 
-  async addCommentService(data, info): Promise<object> {
+  async addCommentService(commentData, tokenInfo): Promise<object> {
     const forInsertData = {
-      ...data,
-      userId: info.id
+      ...commentData,
+      userId: tokenInfo.id
     };
     await getRepository(Comment).save(forInsertData);
 
     const eventInfo = await getRepository(Events).findOne({
       where: {
-        id: data.eventId,
+        id: commentData.eventId,
         isDeleted: false
       }
     });
@@ -367,7 +367,7 @@ export default class UserService {
     return { commentList: commentListInfo };
   }
 
-  async addThumbService(commentId, info): Promise<object> {
+  async addThumbService(commentId, tokenInfo): Promise<object> {
     const comment = await getRepository(Comment).findOne({
       where: {
         id: commentId
@@ -377,17 +377,17 @@ export default class UserService {
     await getRepository(Comment).save(comment);
 
     const forInsertData = {
-      userId: info.id,
+      userId: tokenInfo.id,
       commentId
     };
     await getRepository(UserThumbs).save(forInsertData);
-    const commentIdArr = await makeUserThumbsList(null, commentId, info);
+    const commentIdArr = await makeUserThumbsList(null, commentId, tokenInfo);
     const commentListInfo = await makeCommentList(null, commentId);
 
     return { userThumbsList: commentIdArr, commentList: commentListInfo };
   }
 
-  async removeThumbService(commentId, info): Promise<object> {
+  async removeThumbService(commentId, tokenInfo): Promise<object> {
     const comment = await getRepository(Comment).findOne({
       where: {
         id: commentId
@@ -396,18 +396,18 @@ export default class UserService {
     comment.thumb--;
     await getRepository(Comment).save(comment);
     await getRepository(UserThumbs).delete({
-      userId: info.id,
+      userId: tokenInfo.id,
       commentId: Number(commentId)
     });
 
-    const commentIdArr = await makeUserThumbsList(null, commentId, info);
+    const commentIdArr = await makeUserThumbsList(null, commentId, tokenInfo);
     const commentListInfo = await makeCommentList(null, commentId);
 
     return { userThumbsList: commentIdArr, commentList: commentListInfo };
   }
 
-  async getUserThumbsListService(url, info): Promise<object> {
-    const commentIdArr = await makeUserThumbsList(url, null, info);
+  async getUserThumbsListService(eventUrl, tokenInfo): Promise<object> {
+    const commentIdArr = await makeUserThumbsList(eventUrl, null, tokenInfo);
     return { userThumbsList: commentIdArr };
   }
 }
