@@ -3,7 +3,17 @@ dotenv.config();
 import { Request, Response } from "express";
 import UserService from "../../services/user";
 const service = new UserService();
-import jwt from "jsonwebtoken";
+
+interface TokenData {
+  id: number;
+  email: string;
+  iat: number;
+  exp: number;
+}
+
+interface Req extends Request {
+  tokenData: TokenData;
+}
 
 export default class UserController {
   async getEventListController(req: Request, res: Response): Promise<void> {
@@ -34,7 +44,7 @@ export default class UserController {
     }
   }
 
-  async getCouponListController(req: any, res: Response): Promise<void> {
+  async getCouponListController(req: Req, res: Response): Promise<void> {
     const tokenInfo = req.tokenData;
     const result = await service.getCouponListService(tokenInfo);
     res.status(200).json({
@@ -42,7 +52,7 @@ export default class UserController {
     });
   }
 
-  async addCouponController(req: any, res: Response): Promise<void> {
+  async addCouponController(req: Req, res: Response): Promise<void> {
     const userInfo = req.tokenData;
     const result = await service.addCouponService(req.body, userInfo);
     if (result["key"] === "success") {
@@ -57,7 +67,7 @@ export default class UserController {
     res.status(200).json(result);
   }
 
-  async addCommentController(req: any, res: Response): Promise<void> {
+  async addCommentController(req: Req, res: Response): Promise<void> {
     const userInfo = req.tokenData;
     const result = await service.addCommentService(req.body, userInfo);
     res.status(201).json(result);
@@ -68,7 +78,7 @@ export default class UserController {
     res.status(200).end();
   }
 
-  async addThumbController(req: any, res: Response): Promise<void> {
+  async addThumbController(req: Req, res: Response): Promise<void> {
     const userInfo = req.tokenData;
     const result = await service.addThumbService(
       req.params.commentId,
@@ -77,7 +87,7 @@ export default class UserController {
     res.status(200).json(result);
   }
 
-  async removeThumbController(req: any, res: Response): Promise<void> {
+  async removeThumbController(req: Req, res: Response): Promise<void> {
     const userInfo = req.tokenData;
     const result = await service.removeThumbService(
       req.params.commentId,
@@ -86,7 +96,7 @@ export default class UserController {
     res.status(200).json(result);
   }
 
-  async getUserThumbsListController(req: any, res: Response): Promise<void> {
+  async getUserThumbsListController(req: Req, res: Response): Promise<void> {
     const userInfo = req.tokenData;
     const result = await service.getUserThumbsListService(
       req.params.eventUrl,
