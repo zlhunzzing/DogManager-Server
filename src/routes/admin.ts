@@ -47,12 +47,20 @@ router.post(
 
 router.get("/events/list", jwtCheck, controller.getEventListController);
 
-router.get("/events/entry/:id", jwtCheck, controller.getEventEntryController);
+router.get(
+  "/events/entry/:eventId",
+  jwtCheck,
+  controller.getEventEntryController
+);
 
-router.delete("/events/entry/:id", jwtCheck, controller.deleteEventController);
+router.delete(
+  "/events/entry/:eventId",
+  jwtCheck,
+  controller.deleteEventController
+);
 
 router.put(
-  "/events/entry/:id",
+  "/events/entry/:eventId",
   jwtCheck,
   upload.fields(option),
   controller.putEventController
@@ -64,7 +72,7 @@ router.get("/coupon/list", jwtCheck, controller.getCouponListController);
 
 router.post("/signin", controller.signinController);
 
-router.delete("/coupon/:id", jwtCheck, controller.deleteCouponController);
+router.delete("/coupon/:couponId", jwtCheck, controller.deleteCouponController);
 
 router.get(
   "/user/coupon/list",

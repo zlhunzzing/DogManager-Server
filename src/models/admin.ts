@@ -6,22 +6,22 @@ import { UserCoupon } from "../database/entity/UserCoupon";
 import { User } from "../database/entity/User";
 
 export default class AdminModels {
-  async eventFindOneDetailPage(url) {
+  async eventFindOneDetailPage(eventUrl) {
     return await getRepository(Events).findOne({
       where: {
-        detailPageUrl: url
+        detailPageUrl: eventUrl
       }
     });
   }
 
-  async eventSave(data) {
-    await getRepository(Events).save(data);
+  async eventSave(eventData) {
+    await getRepository(Events).save(eventData);
   }
 
-  async eventFindOneId(id) {
+  async eventFindOneId(eventId) {
     return await getRepository(Events).findOne({
       where: {
-        id,
+        id: eventId,
         isDeleted: false
       }
     });
@@ -81,14 +81,14 @@ export default class AdminModels {
     });
   }
 
-  async couponSave(data) {
-    await getRepository(Coupon).save(data);
+  async couponSave(couponData) {
+    await getRepository(Coupon).save(couponData);
   }
 
-  async couponFindOneId(id) {
+  async couponFindOneId(couponId) {
     return await getRepository(Coupon).findOne({
       where: {
-        id
+        id: couponId
       }
     });
   }
@@ -101,8 +101,8 @@ export default class AdminModels {
     });
   }
 
-  async userCouponSave(data) {
-    await getRepository(UserCoupon).save(data);
+  async userCouponSave(couponList) {
+    await getRepository(UserCoupon).save(couponList);
   }
 
   async userCouponFindAll() {

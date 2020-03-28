@@ -1,4 +1,3 @@
-// import dotenv from 'dotenv'.config();
 import express from "express";
 import bodyParser from "body-parser";
 import adminRouter from "./routes/admin";
@@ -10,7 +9,6 @@ import morgan from "morgan";
 const app = express();
 const PORT: number = 3002;
 app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
   cors({
     origin: [
@@ -21,7 +19,6 @@ app.use(
     credentials: true
   })
 );
-// app.use(morgan("dev"));
 
 if (process.env.NODE_ENV !== "test") {
   createTypeormConnection();
@@ -30,7 +27,6 @@ if (process.env.NODE_ENV !== "test") {
 app.use("/api/user", userRouter);
 app.use("/api/admin", adminRouter);
 
-// start express server
 app.listen(PORT, async () => {
   console.log(`app is listening in port ${PORT}`);
 });

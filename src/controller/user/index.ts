@@ -22,7 +22,7 @@ export default class UserController {
   }
 
   async getEventEntryController(req: Request, res: Response): Promise<void> {
-    const result = await service.getEventEntryService(req.params.url);
+    const result = await service.getEventEntryService(req.params.eventUrl);
     res.status(200).json(result);
   }
 
@@ -53,8 +53,8 @@ export default class UserController {
   }
 
   async addCouponController(req: Req, res: Response): Promise<void> {
-    const userInfo = req.tokenData;
-    const result = await service.addCouponService(req.body, userInfo);
+    const tokenInfo = req.tokenData;
+    const result = await service.addCouponService(req.body, tokenInfo);
     if (result["key"] === "success") {
       res.status(201).send("success");
     } else {
@@ -68,8 +68,8 @@ export default class UserController {
   }
 
   async addCommentController(req: Req, res: Response): Promise<void> {
-    const userInfo = req.tokenData;
-    const result = await service.addCommentService(req.body, userInfo);
+    const tokenInfo = req.tokenData;
+    const result = await service.addCommentService(req.body, tokenInfo);
     res.status(201).json(result);
   }
 
@@ -79,28 +79,28 @@ export default class UserController {
   }
 
   async addThumbController(req: Req, res: Response): Promise<void> {
-    const userInfo = req.tokenData;
+    const tokenInfo = req.tokenData;
     const result = await service.addThumbService(
       req.params.commentId,
-      userInfo
+      tokenInfo
     );
     res.status(200).json(result);
   }
 
   async removeThumbController(req: Req, res: Response): Promise<void> {
-    const userInfo = req.tokenData;
+    const tokenInfo = req.tokenData;
     const result = await service.removeThumbService(
       req.params.commentId,
-      userInfo
+      tokenInfo
     );
     res.status(200).json(result);
   }
 
   async getUserThumbsListController(req: Req, res: Response): Promise<void> {
-    const userInfo = req.tokenData;
+    const tokenInfo = req.tokenData;
     const result = await service.getUserThumbsListService(
       req.params.eventUrl,
-      userInfo
+      tokenInfo
     );
     res.status(200).json(result);
   }

@@ -53,94 +53,103 @@ const getTime = time => {
 };
 
 export default class AdminService {
-  async addEventService(data: EventData): Promise<object> {
+  async addEventService(eventData: EventData): Promise<object> {
     // const inData = await getRepository(Events).findOne({
     //   where: [
     //     {
-    //       detailPageUrl: data.detailPageUrl
+    //       detailPageUrl: eventData.detailPageUrl
     //     }
     //   ]
     // });
     // if (inData) {
-    //   if (inData.detailPageUrl === data.detailPageUrl) {
+    //   if (inData.detailPageUrl === eventData.detailPageUrl) {
     //     return { key: "detailPageUrl" };
     //   }
     // }
     // const events = new Events();
     // const forInsertData = {
     //   ...events,
-    //   ...data,
-    //   detailPageUrl: data.detailPageUrl ? data.detailPageUrl : null,
-    //   couponCode: data.couponCode ? data.couponCode : null
+    //   ...eventData,
+    //   detailPageUrl: eventData.detailPageUrl ? eventData.detailPageUrl : null,
+    //   couponCode: eventData.couponCode ? eventData.couponCode : null
     // };
     // await getRepository(Events).save(forInsertData);
     // return { key: "completed" };
 
-    const inData = await adminModels.eventFindOneDetailPage(data.detailPageUrl);
+    const inData = await adminModels.eventFindOneDetailPage(
+      eventData.detailPageUrl
+    );
     if (inData) {
-      if (inData.detailPageUrl === data.detailPageUrl) {
+      if (inData.detailPageUrl === eventData.detailPageUrl) {
         return { key: "detailPageUrl" };
       }
     }
     const events = new Events();
     const forInsertData = {
       ...events,
-      ...data,
-      detailPageUrl: data.detailPageUrl ? data.detailPageUrl : null,
-      couponCode: data.couponCode ? data.couponCode : null
+      ...eventData,
+      detailPageUrl: eventData.detailPageUrl ? eventData.detailPageUrl : null,
+      couponCode: eventData.couponCode ? eventData.couponCode : null
     };
     await adminModels.eventSave(forInsertData);
     return { key: "completed" };
   }
 
-  async putEventService(data: EventData, id: string): Promise<object> {
+  async putEventService(
+    eventData: EventData,
+    eventId: string
+  ): Promise<object> {
     // const result = await getRepository(Events).findOne({
     //   where: {
-    //     id
+    //     id: eventId
     //   }
     // });
-    // if (result.detailPageUrl !== data.detailPageUrl) {
+    // if (result.detailPageUrl !== eventData.detailPageUrl) {
     //   const inData = await getRepository(Events).findOne({
     //     where: {
-    //       detailPageUrl: data.detailPageUrl
+    //       detailPageUrl: eventData.detailPageUrl
     //     }
     //   });
     //   if (inData) {
-    //     if (inData.detailPageUrl === data.detailPageUrl) {
+    //     if (inData.detailPageUrl === eventData.detailPageUrl) {
     //       return { key: "detailPageUrl" };
     //     }
     //   }
     // }
     // const updatedResult2 = {
     //   ...result,
-    //   ...data,
-    //   buttonImage: data.buttonImage ? data.buttonImage : result.buttonImage,
-    //   bannerImage: data.bannerImage ? data.bannerImage : result.bannerImage,
-    //   pageImage: data.pageImage ? data.pageImage : result.pageImage
+    //   ...eventData,
+    //   buttonImage: eventData.buttonImage ? eventData.buttonImage : result.buttonImage,
+    //   bannerImage: eventData.bannerImage ? eventData.bannerImage : result.bannerImage,
+    //   pageImage: eventData.pageImage ? eventData.pageImage : result.pageImage
     // };
     // await getRepository(Events).save(updatedResult2);
     // return { key: "completed" };
 
-    const result = await adminModels.eventFindOneId(id);
+    const result = await adminModels.eventFindOneId(eventId);
 
-    if (result.detailPageUrl !== data.detailPageUrl) {
+    if (result.detailPageUrl !== eventData.detailPageUrl) {
       const inData = await adminModels.eventFindOneDetailPage(
-        data.detailPageUrl
+        eventData.detailPageUrl
       );
       if (inData) {
-        if (inData.detailPageUrl === data.detailPageUrl) {
+        if (inData.detailPageUrl === eventData.detailPageUrl) {
           return { key: "detailPageUrl" };
         }
       }
     }
-    const updatedResult2 = {
+    const updatedResult = {
       ...result,
-      ...data,
-      buttonImage: data.buttonImage ? data.buttonImage : result.buttonImage,
-      bannerImage: data.bannerImage ? data.bannerImage : result.bannerImage,
-      pageImage: data.pageImage ? data.pageImage : result.pageImage
+      ...eventData,
+      buttonImage: eventData.buttonImage
+        ? eventData.buttonImage
+        : result.buttonImage,
+      bannerImage: eventData.bannerImage
+        ? eventData.bannerImage
+        : result.bannerImage,
+      pageImage: eventData.pageImage ? eventData.pageImage : result.pageImage
     };
-    await adminModels.eventSave(updatedResult2);
+    await adminModels.eventSave(updatedResult);
     return { key: "completed" };
   }
 
@@ -164,10 +173,10 @@ export default class AdminService {
     return result;
   }
 
-  async getEventEntryService(id: string, couponCode: string): Promise<object> {
+  async getEventEntryService(eventId: string): Promise<object> {
     // const eventInfo = await getRepository(Events).findOne({
     //   where: {
-    //     id,
+    //     id: eventId
     //     isDeleted: false
     //   }
     // });
@@ -186,7 +195,7 @@ export default class AdminService {
     // };
     // return result;
 
-    const eventInfo = await adminModels.eventFindOneId(id);
+    const eventInfo = await adminModels.eventFindOneId(eventId);
     const couponInfo = await adminModels.couponFindOneCouponCode(
       eventInfo.couponCode
     );
@@ -199,22 +208,22 @@ export default class AdminService {
     return result;
   }
 
-  async deleteEventService(id: string): Promise<void> {
+  async deleteEventService(eventId: string): Promise<void> {
     // const result = await getRepository(Events).findOne({
     //   where: {
-    //     id
+    //     id: eventId
     //   }
     // });
     // result.isDeleted = true;
     // await getRepository(Events).save(result);
 
-    const result = await adminModels.eventFindOneId(id);
+    const result = await adminModels.eventFindOneId(eventId);
     result.isDeleted = true;
     await adminModels.eventSave(result);
   }
 
-  async signinService(data: EventData): Promise<object> {
-    // const { email, password } = data;
+  async signinService(adminInfo: EventData): Promise<object> {
+    // const { email, password } = adminInfo;
 
     // const result = await getRepository(Admin).findOne({
     //   where: {
@@ -239,7 +248,7 @@ export default class AdminService {
     //   return { key: "unvalid user" };
     // }
 
-    const { email, password } = data;
+    const { email, password } = adminInfo;
 
     const result = await adminModels.adminFindOneAccount(email, password);
 
@@ -260,38 +269,38 @@ export default class AdminService {
     }
   }
 
-  async createCouponService(data: CouponData): Promise<object> {
+  async createCouponService(couponData: CouponData): Promise<object> {
     // const result = await getRepository(Coupon).findOne({
     //   where: [
     //     {
-    //       couponName: data.couponName
+    //       couponName: couponData.couponName
     //     },
     //     {
-    //       couponCode: data.couponCode
+    //       couponCode: couponData.couponCode
     //     }
     //   ]
     // });
     // if (result) {
-    //   if (result.couponName === data.couponName) {
+    //   if (result.couponName === couponData.couponName) {
     //     return { key: "couponName already exist" };
-    //   } else if (result.couponCode === data.couponCode) {
+    //   } else if (result.couponCode === couponData.couponCode) {
     //     return { key: "couponCode already exist" };
     //   }
     // }
-    // await getRepository(Coupon).save(data);
+    // await getRepository(Coupon).save(couponData);
 
     const result = await adminModels.couponFindOneNameOrCode(
-      data.couponName,
-      data.couponCode
+      couponData.couponName,
+      couponData.couponCode
     );
     if (result) {
-      if (result.couponName === data.couponName) {
+      if (result.couponName === couponData.couponName) {
         return { key: "couponName already exist" };
-      } else if (result.couponCode === data.couponCode) {
+      } else if (result.couponCode === couponData.couponCode) {
         return { key: "couponCode already exist" };
       }
     }
-    await adminModels.couponSave(data);
+    await adminModels.couponSave(couponData);
   }
 
   async getCouponListService(): Promise<object> {
@@ -306,11 +315,11 @@ export default class AdminService {
     return couponList;
   }
 
-  async deleteCouponService(id): Promise<void> {
+  async deleteCouponService(couponId): Promise<void> {
     // // Coupon 테이블에서 해당 쿠폰 isDeleted 를 true로 변경
     // const result = await getRepository(Coupon).findOne({
     //   where: {
-    //     id
+    //     id: couponId
     //   }
     // });
     // result.isDeleted = true;
@@ -330,18 +339,18 @@ export default class AdminService {
     // await getRepository(UserCoupon).save(result2);
 
     // Coupon 테이블에서 해당 쿠폰 isDeleted 를 true로 변경
-    const result = await adminModels.couponFindOneId(id);
+    const result = await adminModels.couponFindOneId(couponId);
     result.isDeleted = true;
     await adminModels.couponSave(result);
 
     // UserCoupon 테이블에서 해당쿠폰이 들어간 모든 열의 isDeleted를
     // couponState.canceled 로 변경
     const UserCouponList = await adminModels.userCouponFindCouponId(result.id);
-    const result2 = await UserCouponList.map(x => {
+    const couponListForCancel = await UserCouponList.map(x => {
       x.isDeleted = couponState.canceled;
       return x;
     });
-    await adminModels.userCouponSave(result2);
+    await adminModels.userCouponSave(couponListForCancel);
   }
 
   async getUserCouponListService(): Promise<object> {
