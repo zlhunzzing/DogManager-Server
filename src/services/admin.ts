@@ -169,7 +169,7 @@ export default class AdminService {
           id: result.id,
           email
         },
-        process.env.JWT_ADMIN_SECRET_KEY,
+        process.env.JWT_SECRET_KEY,
         {
           expiresIn: "1h"
         }
