@@ -1,14 +1,17 @@
+import dotenv from "dotenv";
+dotenv.config();
 import * as express from "express";
 import AdminController from "../controller/admin";
 const controller = new AdminController();
 const router = express.Router({ strict: true });
-
+import jwtMiddleware from "express-jwt-middleware";
 import AWS from "aws-sdk";
 import path from "path";
 import multer from "multer";
 import multerS3 from "multer-s3";
 AWS.config.loadFromPath(__dirname + "/../../awsconfig.json");
 
+const jwtCheck = jwtMiddleware(process.env.JWT_SECRET_KEY);
 const s3 = new AWS.S3();
 const upload = multer({
   storage: multerS3({
@@ -37,30 +40,36 @@ const option = [
 
 router.post(
   "/events/entry",
+  jwtCheck,
   upload.fields(option),
   controller.addEventController
 );
 
-router.get("/events/list", controller.getEventListController);
+router.get("/events/list", jwtCheck, controller.getEventListController);
 
-router.get("/events/entry/:id", controller.getEventEntryController);
+router.get("/events/entry/:id", jwtCheck, controller.getEventEntryController);
 
-router.delete("/events/entry/:id", controller.deleteEventController);
+router.delete("/events/entry/:id", jwtCheck, controller.deleteEventController);
 
 router.put(
   "/events/entry/:id",
+  jwtCheck,
   upload.fields(option),
   controller.putEventController
 );
 
-router.post("/coupon", controller.createCouponController);
+router.post("/coupon", jwtCheck, controller.createCouponController);
 
-router.get("/coupon/list", controller.getCouponListController);
+router.get("/coupon/list", jwtCheck, controller.getCouponListController);
 
 router.post("/signin", controller.signinController);
 
-router.delete("/coupon/:id", controller.deleteCouponController);
+router.delete("/coupon/:id", jwtCheck, controller.deleteCouponController);
 
-router.get("/user/coupon/list", controller.getUserCouponListController);
+router.get(
+  "/user/coupon/list",
+  jwtCheck,
+  controller.getUserCouponListController
+);
 
 export default router;

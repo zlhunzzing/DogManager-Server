@@ -246,7 +246,7 @@ export default class UserService {
           id: result.id,
           email: result.email
         },
-        process.env.JWT_USER_SECRET_KEY,
+        process.env.JWT_SECRET_KEY,
         {
           expiresIn: "1h"
         }

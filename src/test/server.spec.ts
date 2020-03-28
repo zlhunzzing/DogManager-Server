@@ -79,21 +79,45 @@ describe("Implemented testcase", () => {
       it("should create a new event", done => {
         const agent = chai.request.agent(app);
         agent
-          .post("/api/admin/events/entry")
-          .set("Authorization", getToken())
-          .field("eventTitle", "new event 3")
-          .field("startDate", "202003161105")
-          .field("endDate", "202004012359")
-          .field("detailPageUrl", "detail page url")
-          .field("couponCode", "code1234")
-          .field("buttonImage", "button image")
-          .field("bannerImage", "banner image")
-          .field("pageImage", "page image")
-          .end((err, res) => {
-            if (err) done(err);
-            expect(res).to.have.status(201);
-            done();
+          .post("/api/admin/signin")
+          .send({
+            email: "admin@dogmate.com",
+            password: "1234"
+          })
+          .then(res => {
+            agent
+              .post("/api/admin/events/entry")
+              .set("Authorization", res.body.token)
+              .field("eventTitle", "new event 3")
+              .field("startDate", "202003161105")
+              .field("endDate", "202004012359")
+              .field("detailPageUrl", "detail page url")
+              .field("couponCode", "code1234")
+              .field("buttonImage", "button image")
+              .field("bannerImage", "banner image")
+              .field("pageImage", "page image")
+              .end((err, res2) => {
+                if (err) done(err);
+                expect(res2).to.have.status(201);
+                done();
+              });
           });
+        // agent
+        //   .post("/api/admin/events/entry")
+        //   .set("Authorization", getToken())
+        //   .field("eventTitle", "new event 3")
+        //   .field("startDate", "202003161105")
+        //   .field("endDate", "202004012359")
+        //   .field("detailPageUrl", "detail page url")
+        //   .field("couponCode", "code1234")
+        //   .field("buttonImage", "button image")
+        //   .field("bannerImage", "banner image")
+        //   .field("pageImage", "page image")
+        //   .end((err, res) => {
+        //     if (err) done(err);
+        //     expect(res).to.have.status(201);
+        //     done();
+        //   });
       });
       it("If the detailPageUrl is duplicated, the status code 409 must be returned", done => {
         const agent = chai.request.agent(app);
