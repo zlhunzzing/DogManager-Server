@@ -39,9 +39,12 @@ const getTime = time => {
   const year = time.getFullYear();
   let month = (time.getMonth() + 1).toString();
   month = Number(month) < 10 ? "0" + month : month;
-  const date = time.getDate();
-  const hour = time.getHours();
-  const minute = time.getMinutes();
+  let date = time.getDate();
+  date = Number(date) < 10 ? "0" + date : date;
+  let hour = time.getHours();
+  hour = Number(hour) < 10 ? "0" + hour : hour;
+  let minute = time.getMinutes();
+  minute = Number(minute) < 10 ? "0" + minute : minute;
   const result2 = "" + year + month + date + hour + minute;
   return result2;
 };
