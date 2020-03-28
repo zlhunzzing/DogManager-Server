@@ -2,7 +2,6 @@ import dotenv from "dotenv";
 dotenv.config();
 import { Request, Response } from "express";
 import adminService from "../../services/admin";
-import jwt from "jsonwebtoken";
 
 const service = new adminService();
 
@@ -55,8 +54,7 @@ export default class AdminController {
     }
   }
 
-  async getEventListController(req: any, res: Response): Promise<void> {
-    const userInfo = req.tokenData;
+  async getEventListController(req: Request, res: Response): Promise<void> {
     const result = await service.getEventListService();
     res.status(200).json({ eventList: result });
   }

@@ -14,6 +14,7 @@ import { User } from "../database/entity/User";
 import { UserCoupon } from "../database/entity/UserCoupon";
 import { getRepository, getConnection, Repository } from "typeorm";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 const dataForCreateEvent = (num: number = 1): object => {
   return {
@@ -28,33 +29,8 @@ const dataForCreateEvent = (num: number = 1): object => {
   };
 };
 
-const getToken = () => {
-  const token = jwt.sign(
-    {
-      id: 1,
-      email: "admin@dogmate.com"
-    },
-    process.env.JWT_ADMIN_SECRET_KEY,
-    {
-      expiresIn: "1h"
-    }
-  );
-  return token;
-};
-
-const getUserToken = () => {
-  const token = jwt.sign(
-    {
-      id: 1,
-      email: "user@dogmate.com"
-    },
-    process.env.JWT_USER_SECRET_KEY,
-    {
-      expiresIn: "1h"
-    }
-  );
-  return token;
-};
+let adminToken;
+let userToken;
 
 describe("Implemented testcase", () => {
   before(async () => {
@@ -64,6 +40,36 @@ describe("Implemented testcase", () => {
       password: "1234"
     };
     await getRepository(Admin).save(adminInfo);
+    const shasum = crypto.createHmac("sha512", process.env.CRYPTO_SECRET_KEY);
+    shasum.update("1234");
+    const userInfo = {
+      email: "admin@dogmate.com",
+      password: shasum.digest("hex"),
+      name: "testUser",
+      mobile: "010-0000-0000",
+      address: "test address"
+    };
+    await getRepository(User).save(userInfo);
+    chai
+      .request(app)
+      .post("/api/admin/signin")
+      .send({
+        email: "admin@dogmate.com",
+        password: "1234"
+      })
+      .end((err, res) => {
+        adminToken = res.body.token;
+      });
+    chai
+      .request(app)
+      .post("/api/user/signin")
+      .send({
+        email: "admin@dogmate.com",
+        password: "1234"
+      })
+      .end((err, res) => {
+        userToken = res.body.token;
+      });
   });
   afterEach(async () => {
     const repository = await getRepository(Events);
@@ -78,52 +84,35 @@ describe("Implemented testcase", () => {
     describe("POST /api/admin/events/entry", () => {
       it("should create a new event", done => {
         const agent = chai.request.agent(app);
-        agent
-          .post("/api/admin/signin")
-          .send({
-            email: "admin@dogmate.com",
-            password: "1234"
-          })
-          .then(res => {
-            agent
-              .post("/api/admin/events/entry")
-              .set("Authorization", res.body.token)
-              .field("eventTitle", "new event 3")
-              .field("startDate", "202003161105")
-              .field("endDate", "202004012359")
-              .field("detailPageUrl", "detail page url")
-              .field("couponCode", "code1234")
-              .field("buttonImage", "button image")
-              .field("bannerImage", "banner image")
-              .field("pageImage", "page image")
-              .end((err, res2) => {
-                if (err) done(err);
-                expect(res2).to.have.status(201);
-                done();
-              });
-          });
         // agent
-        //   .post("/api/admin/events/entry")
-        //   .set("Authorization", getToken())
-        //   .field("eventTitle", "new event 3")
-        //   .field("startDate", "202003161105")
-        //   .field("endDate", "202004012359")
-        //   .field("detailPageUrl", "detail page url")
-        //   .field("couponCode", "code1234")
-        //   .field("buttonImage", "button image")
-        //   .field("bannerImage", "banner image")
-        //   .field("pageImage", "page image")
-        //   .end((err, res) => {
-        //     if (err) done(err);
-        //     expect(res).to.have.status(201);
-        //     done();
-        //   });
+        //   .post("/api/admin/signin")
+        //   .send({
+        //     email: "admin@dogmate.com",
+        //     password: "1234"
+        //   })
+        //   .then(res => {
+        agent
+          .post("/api/admin/events/entry")
+          .set("Authorization", adminToken)
+          .field("eventTitle", "new event 3")
+          .field("startDate", "202003161105")
+          .field("endDate", "202004012359")
+          .field("detailPageUrl", "detail page url")
+          .field("couponCode", "code1234")
+          .field("buttonImage", "button image")
+          .field("bannerImage", "banner image")
+          .field("pageImage", "page image")
+          .end((err, res2) => {
+            if (err) done(err);
+            expect(res2).to.have.status(201);
+            done();
+          });
       });
       it("If the detailPageUrl is duplicated, the status code 409 must be returned", done => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/admin/events/entry")
-          .set("Authorization", getToken())
+          .set("Authorization", adminToken)
           .field("eventTitle", "new event 3")
           .field("startDate", "202003161105")
           .field("endDate", "202004012359")
@@ -146,7 +135,7 @@ describe("Implemented testcase", () => {
         const agent = chai.request.agent(app);
         agent
           .get("/api/admin/events/list")
-          .set("Authorization", getToken())
+          .set("Authorization", adminToken)
           .end((err, res) => {
             if (err) done(err);
             expect(res).to.have.status(200);
@@ -161,7 +150,7 @@ describe("Implemented testcase", () => {
         const agent = chai.request.agent(app);
         agent
           .get("/api/admin/events/entry/1")
-          .set("Authorization", getToken())
+          .set("Authorization", adminToken)
           .end((err, res) => {
             if (err) done(err);
             expect(res).to.have.status(200);
@@ -191,7 +180,7 @@ describe("Implemented testcase", () => {
         const agent = chai.request.agent(app);
         agent
           .put("/api/admin/events/entry/1")
-          .set("Authorization", getToken())
+          .set("Authorization", adminToken)
           .field("eventTitle", "new event 3")
           .field("startDate", "202003161105")
           .field("endDate", "202004012359")
@@ -203,7 +192,7 @@ describe("Implemented testcase", () => {
           .then(() => {
             agent
               .get("/api/admin/events/entry/1")
-              .set("Authorization", getToken())
+              .set("Authorization", adminToken)
               .end((err, res) => {
                 if (err) done(err);
                 expect(res).to.have.status(200);
@@ -216,7 +205,7 @@ describe("Implemented testcase", () => {
         const agent = chai.request.agent(app);
         agent
           .put("/api/admin/events/entry/1")
-          .set("Authorization", getToken())
+          .set("Authorization", adminToken)
           .field("eventTitle", "new event 1")
           .field("startDate", "202003161105")
           .field("endDate", "202004012359")
@@ -239,11 +228,11 @@ describe("Implemented testcase", () => {
         const agent = chai.request.agent(app);
         agent
           .delete("/api/admin/events/entry/1")
-          .set("Authorization", getToken())
+          .set("Authorization", adminToken)
           .then(() => {
             agent
               .get("/api/admin/events/list")
-              .set("Authorization", getToken())
+              .set("Authorization", adminToken)
               .end((err, res) => {
                 if (err) done(err);
                 expect(res).to.have.status(200);
@@ -420,7 +409,7 @@ describe("Implemented testcase", () => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/admin/coupon")
-          .set("Authorization", getToken())
+          .set("Authorization", adminToken)
           .send({
             couponName: "first coupon",
             couponCode: "@first",
@@ -437,7 +426,7 @@ describe("Implemented testcase", () => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/admin/coupon")
-          .set("Authorization", getToken())
+          .set("Authorization", adminToken)
           .send({
             couponName: "second coupon",
             couponCode: "@first",
@@ -455,7 +444,7 @@ describe("Implemented testcase", () => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/admin/coupon")
-          .set("Authorization", getToken())
+          .set("Authorization", adminToken)
           .send({
             couponName: "third coupon",
             couponCode: "@second",
@@ -486,7 +475,7 @@ describe("Implemented testcase", () => {
         const agent = chai.request.agent(app);
         await agent
           .post("/api/admin/coupon")
-          .set("Authorization", getToken())
+          .set("Authorization", adminToken)
           .send({
             couponName: "sale 50 coupon",
             couponCode: "testCoupon",
@@ -503,7 +492,7 @@ describe("Implemented testcase", () => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/user/coupon")
-          .set("Authorization", getUserToken())
+          .set("Authorization", userToken)
           .send({
             couponCode: "testCoupon",
             expiredAt: "202104010200"
@@ -520,7 +509,7 @@ describe("Implemented testcase", () => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/user/coupon")
-          .set("Authorization", getUserToken())
+          .set("Authorization", userToken)
           .send({
             couponCode: "testCoupon",
             expiredAt: "202104010200"
@@ -529,7 +518,7 @@ describe("Implemented testcase", () => {
             expect(res).to.have.status(201);
             agent
               .post("/api/user/coupon")
-              .set("Authorization", getUserToken())
+              .set("Authorization", userToken)
               .send({
                 couponCode: "testCoupon",
                 expiredAt: "202104010200"
@@ -566,7 +555,7 @@ describe("Implemented testcase", () => {
         const agent = chai.request.agent(app);
         agent
           .get("/api/admin/coupon/list")
-          .set("Authorization", getToken())
+          .set("Authorization", adminToken)
           .end((err, res) => {
             expect(res).to.have.status(200);
             expect(res.body.couponList.length).to.equal(2);
@@ -592,7 +581,7 @@ describe("Implemented testcase", () => {
         const agent = chai.request.agent(app);
         await agent
           .post("/api/admin/coupon")
-          .set("Authorization", getToken())
+          .set("Authorization", adminToken)
           .send({
             couponName: "coupon2",
             couponCode: "code2",
@@ -606,14 +595,14 @@ describe("Implemented testcase", () => {
             couponCode: "code2",
             expiredAt: "202104010200"
           })
-          .set("Authorization", getUserToken());
+          .set("Authorization", userToken);
       });
 
       it("should get user's coupons", done => {
         const agent = chai.request.agent(app);
         agent
           .get("/api/user/coupon/list")
-          .set("Authorization", getUserToken())
+          .set("Authorization", userToken)
           .end((err, res) => {
             if (err) done(err);
             expect(res).to.have.status(200);
@@ -650,12 +639,12 @@ describe("Implemented testcase", () => {
         const agent = chai.request.agent(app);
         agent
           .delete("/api/admin/coupon/2")
-          .set("Authorization", getToken())
+          .set("Authorization", adminToken)
           .then(res1 => {
             expect(res1).to.have.status(200);
             agent
               .get("/api/admin/coupon/list")
-              .set("Authorization", getToken())
+              .set("Authorization", adminToken)
               .end((err, res2) => {
                 expect(res2.body.couponList.length).to.equal(1);
                 done();
