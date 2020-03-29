@@ -22,7 +22,7 @@ export default class CreateUsers implements Seeder {
       {
         couponName: "third coupon",
         couponCode: "@third",
-        description: "this is second coupon",
+        description: "this is third coupon",
         period: 7,
         discount: "30%"
       }
