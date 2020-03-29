@@ -336,7 +336,11 @@ export default class UserService {
     return { commentList: commentListInfo };
   }
 
-  async updateCommentService(commentData, commentId): Promise<void> {
+  async updateCommentService(
+    commentData,
+    commentId,
+    tokenInfo
+  ): Promise<object> {
     const comment = await getRepository(Comment).findOne({
       where: {
         id: commentId
@@ -344,6 +348,11 @@ export default class UserService {
     });
     comment.content = commentData.content;
     await getRepository(Comment).save(comment);
+
+    const commentIdArr = await makeUserThumbsList(null, commentId, tokenInfo);
+    const commentListInfo = await makeCommentList(null, commentId);
+
+    return { userThumbsList: commentIdArr, commentList: commentListInfo };
   }
 
   async addCommentService(commentData, tokenInfo): Promise<object> {

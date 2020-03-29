@@ -73,9 +73,14 @@ export default class UserController {
     res.status(201).json(result);
   }
 
-  async updateCommentController(req: Request, res: Response): Promise<void> {
-    await service.updateCommentService(req.body, req.params.commentId);
-    res.status(200).end();
+  async updateCommentController(req: Req, res: Response): Promise<void> {
+    const tokenInfo = req.tokenData;
+    const result = await service.updateCommentService(
+      req.body,
+      req.params.commentId,
+      tokenInfo
+    );
+    res.status(200).json(result);
   }
 
   async addThumbController(req: Req, res: Response): Promise<void> {
