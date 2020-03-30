@@ -84,13 +84,6 @@ describe("Implemented testcase", () => {
     describe("POST /api/admin/events/entry", () => {
       it("should create a new event", done => {
         const agent = chai.request.agent(app);
-        // agent
-        //   .post("/api/admin/signin")
-        //   .send({
-        //     email: "admin@dogmate.com",
-        //     password: "1234"
-        //   })
-        //   .then(res => {
         agent
           .post("/api/admin/events/entry")
           .set("Authorization", adminToken)
