@@ -109,4 +109,11 @@ export default class UserController {
     );
     res.status(200).json(result);
   }
+
+  async getUserIdController(req: Req, res: Response): Promise<void> {
+    const tokenInfo = req.tokenData;
+    res.status(200).json({
+      id: tokenInfo.id
+    });
+  }
 }

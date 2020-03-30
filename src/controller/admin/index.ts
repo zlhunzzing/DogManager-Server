@@ -13,6 +13,17 @@ export interface MulterFile {
   size: number;
 }
 
+interface TokenData {
+  id: number;
+  email: string;
+  iat: number;
+  exp: number;
+}
+
+interface Req extends Request {
+  tokenData: TokenData;
+}
+
 export default class AdminController {
   async addEventController(
     req: any & { files: MulterFile[] },
@@ -109,6 +120,13 @@ export default class AdminController {
     const result = await service.getUserCouponListService();
     res.status(200).json({
       couponList: result["key"]
+    });
+  }
+
+  async getAdminIdController(req: Req, res: Response): Promise<void> {
+    const tokenInfo = req.tokenData;
+    res.status(200).json({
+      id: tokenInfo.id
     });
   }
 }
