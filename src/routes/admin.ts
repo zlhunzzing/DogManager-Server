@@ -38,6 +38,8 @@ const option = [
   { name: "couponCode", maxCount: 5 }
 ];
 
+router.get("/adminId", jwtCheck, controller.getAdminIdController);
+
 router.post(
   "/events/entry",
   jwtCheck,

@@ -22,7 +22,7 @@ const dataForCreateEvent = (num: number = 1): object => {
     eventTitle: `new event ${num}`,
     startDate: "202003161105",
     endDate: "202004012359",
-    detailPageUrl: `/detail page url ${num}`,
+    detailPageUrl: `/detail${num}`,
     buttonImage: "button image",
     bannerImage: "banner image",
     pageImage: "page image",
@@ -77,7 +77,7 @@ describe("Implemented testcase", () => {
     await repository.query(`TRUNCATE TABLE events;`);
   });
 
-  xdescribe("EVENT API TEST", () => {
+  describe("EVENT API TEST", () => {
     beforeEach(async () => {
       const data = [dataForCreateEvent(1), dataForCreateEvent(2)];
       await getRepository(Events).save(data);
@@ -110,7 +110,7 @@ describe("Implemented testcase", () => {
           .field("eventTitle", "new event 3")
           .field("startDate", "202003161105")
           .field("endDate", "202004012359")
-          .field("detailPageUrl", "detail page url 1")
+          .field("detailPageUrl", "/detail1")
           .field("couponCode", "code1234")
           .field("buttonImage", "button image")
           .field("bannerImage", "banner image")
@@ -203,7 +203,7 @@ describe("Implemented testcase", () => {
           .field("eventTitle", "new event 1")
           .field("startDate", "202003161105")
           .field("endDate", "202004012359")
-          .field("detailPageUrl", "detail page url 2")
+          .field("detailPageUrl", "/detail2")
           .field("couponCode", "code1234")
           .field("buttonImage", "button image")
           .field("bannerImage", "banner image")
@@ -238,7 +238,7 @@ describe("Implemented testcase", () => {
     });
   });
 
-  xdescribe("LOGIN API TEST", () => {
+  describe("LOGIN API TEST", () => {
     describe("POST /api/admin/signin", () => {
       beforeEach(async () => {
         const adminData = {
@@ -381,7 +381,7 @@ describe("Implemented testcase", () => {
     });
   });
 
-  xdescribe("COUPON API TEST", () => {
+  describe("COUPON API TEST", () => {
     afterEach(async () => {
       const CouponTable = await getRepository(Coupon);
       await CouponTable.query(`TRUNCATE TABLE coupon;`);
@@ -647,7 +647,46 @@ describe("Implemented testcase", () => {
       });
     });
 
-    describe("GET /api/admin/user/coupon/list", () => {});
+    describe("GET /api/admin/user/coupon/list", () => {
+      before(async () => {
+        await getRepository(Events).save(dataForCreateEvent());
+        const couponData = {
+          couponName: "test coupon",
+          couponCode: "@test",
+          description: "this is test coupon",
+          period: 7,
+          discount: "10%"
+        };
+        await getRepository(Coupon).save(couponData);
+        const userCouponData = {
+          couponId: 1,
+          userId: 1,
+          expiredAt: "202005011200"
+        };
+        await getRepository(UserCoupon).save(userCouponData);
+      });
+      it("should get user's coupon list", done => {
+        const agent = chai.request.agent(app);
+        agent
+          .get("/api/admin/user/coupon/list")
+          .set("Authorization", userToken)
+          .end((err, res) => {
+            if (err) done(err);
+            expect(res).to.have.status(200);
+            expect(res.body.couponList).to.have.length(1);
+            expect(res.body.couponList[0]).has.all.keys([
+              "userName",
+              "userEmail",
+              "couponName",
+              "couponCode",
+              "assignedAt",
+              "expiredAt",
+              "isDeleted"
+            ]);
+            done();
+          });
+      });
+    });
   });
 
   describe("COMMENT API TEST", () => {
@@ -681,13 +720,65 @@ describe("Implemented testcase", () => {
           .end((err, res) => {
             if (err) done(err);
             expect(res).to.have.status(200);
+            expect(res.body.commentList[0].thumb).to.equal(1);
             done();
           });
       });
     });
 
-    describe("DELETE /api/user/comment/entry/thumb/:commentId", () => {});
+    describe("DELETE /api/user/comment/entry/thumb/:commentId", () => {
+      before(async () => {
+        await getRepository(Events).save(dataForCreateEvent());
+        const commentData = {
+          content: "this is test",
+          eventId: 1,
+          userId: 1,
+          thumb: 1
+        };
+        await getRepository(Comment).save(commentData);
+      });
+      it("should delete thumb to comment", done => {
+        const agent = chai.request.agent(app);
+        agent
+          .delete("/api/user/comment/entry/thumb/1")
+          .set("Authorization", userToken)
+          .end((err, res) => {
+            if (err) done(err);
+            expect(res).to.have.status(200);
+            expect(res.body.commentList[0].thumb).to.equal(0);
+            done();
+          });
+      });
+    });
 
-    describe("GET /api/user/thumb/list/:eventUrl", () => {});
+    describe("GET /api/user/thumb/list/:eventUrl", () => {
+      before(async () => {
+        await getRepository(Events).save(dataForCreateEvent());
+        const commentData = {
+          content: "this is test",
+          eventId: 1,
+          userId: 1,
+          thumb: 1
+        };
+        const userThumbsData = {
+          userId: 1,
+          commentId: 1
+        };
+        await getRepository(Comment).save(commentData);
+        await getRepository(UserThumbs).save(userThumbsData);
+      });
+      it("should get user's thumbs list", done => {
+        const agent = chai.request.agent(app);
+        agent
+          .get("/api/user/thumb/list/detail1")
+          .set("Authorization", userToken)
+          .end((err, res) => {
+            if (err) done(err);
+            expect(res).to.have.status(200);
+            expect(res.body.userThumbsList[0]).to.equal(1);
+            done();
+          });
+      });
+    });
   });
 });

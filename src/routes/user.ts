@@ -5,6 +5,8 @@ const router = express.Router({ strict: true });
 import jwtMiddleware from "express-jwt-middleware";
 const jwtCheck = jwtMiddleware(process.env.JWT_SECRET_KEY);
 
+router.get("/userId", jwtCheck, controller.getUserIdController);
+
 router.get("/events/list", controller.getEventListController);
 
 router.get("/events/entry/:eventUrl", controller.getEventEntryController);
