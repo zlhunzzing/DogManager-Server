@@ -44,7 +44,7 @@ describe("Implemented testcase", () => {
     const shasum = crypto.createHmac("sha512", process.env.CRYPTO_SECRET_KEY);
     shasum.update("1234");
     const userInfo = {
-      email: "admin@dogmate.com",
+      email: "user1@dogmate.com",
       password: shasum.digest("hex"),
       name: "testUser",
       mobile: "010-0000-0000",
@@ -65,7 +65,7 @@ describe("Implemented testcase", () => {
       .request(app)
       .post("/api/user/signin")
       .send({
-        email: "admin@dogmate.com",
+        email: "user1@dogmate.com",
         password: "1234"
       })
       .end((err, res) => {
@@ -696,11 +696,82 @@ describe("Implemented testcase", () => {
       const UserCouponTable = await getRepository(UserThumbs);
       await UserCouponTable.query(`TRUNCATE TABLE user_thumbs;`);
     });
-    describe("POST /api/user/comment/entry", () => {});
+    describe("POST /api/user/comment/entry", () => {
+      // 댓글을 추가할 이벤트를 생성
+      beforeEach(async () => {
+        const data = dataForCreateEvent(1);
+        await getRepository(Events).save(data);
+      });
+      it("댓글을 추가할 수 있어야 한다.", done => {
+        const agent = chai.request.agent(app);
+        agent
+          .post("/api/user/comment/entry")
+          .set("Authorization", userToken)
+          .send({
+            content: "test content",
+            eventId: 1
+          })
+          .then(res => {
+            expect(res).to.have.status(201);
+            expect(res.body.commentList).to.have.length(1);
+            done();
+          });
+      });
+    });
 
-    describe("PUT /api/user/comment/entry/:commentId", () => {});
+    describe("PUT /api/user/comment/entry/:commentId", () => {
+      // 수정할 댓글을 생성
+      beforeEach(async () => {
+        const data = dataForCreateEvent(1);
+        await getRepository(Events).save(data);
+        const comment = {
+          content: "testContent",
+          userId: 1,
+          eventId: 1
+        };
+        await getRepository(Comment).save(comment);
+      });
+      it("댓글 수정할 수 있어야 한다.", done => {
+        const agent = chai.request.agent(app);
+        agent
+          .put("/api/user/comment/entry/1")
+          .set("Authorization", userToken)
+          .send({
+            content: "testContent2",
+            eventId: 1
+          })
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body.commentList[0].content).to.equal("testContent2");
+            done();
+          });
+      });
+    });
 
-    describe("DELETE /api/user/comment/entry/:commentId", () => {});
+    describe("DELETE /api/user/comment/entry/:commentId", () => {
+      //삭제할 댓글을 생성
+      beforeEach(async () => {
+        const data = dataForCreateEvent(1);
+        await getRepository(Events).save(data);
+        const comment = {
+          content: "testContent",
+          userId: 1,
+          eventId: 1
+        };
+        await getRepository(Comment).save(comment);
+      });
+      it("댓글을 삭제할 수 있어야 한다.", done => {
+        const agent = chai.request.agent(app);
+        agent
+          .delete("/api/user/comment/entry/1")
+          .set("Authorization", userToken)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body.commentList).to.have.length(0);
+            done();
+          });
+      });
+    });
 
     describe("POST /api/user/comment/entry/thumb/:commentId", () => {
       before(async () => {
