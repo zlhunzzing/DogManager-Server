@@ -139,7 +139,8 @@ export default class AdminService {
       const token = jwt.sign(
         {
           id: result.id,
-          email
+          email,
+          isUser: false
         },
         process.env.JWT_SECRET_KEY,
         {

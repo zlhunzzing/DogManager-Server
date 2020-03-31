@@ -7,6 +7,7 @@ const service = new UserService();
 interface TokenData {
   id: number;
   email: string;
+  isUser: boolean;
   iat: number;
   exp: number;
 }
