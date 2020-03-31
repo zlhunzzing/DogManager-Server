@@ -175,7 +175,8 @@ export default class UserService {
       const token = jwt.sign(
         {
           id: result.id,
-          email: result.email
+          email: result.email,
+          isUser: true
         },
         process.env.JWT_SECRET_KEY,
         {
