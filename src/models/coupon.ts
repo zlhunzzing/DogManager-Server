@@ -2,30 +2,52 @@ import { Coupon } from "../database/entity/Coupon";
 import { getRepository } from "typeorm";
 
 export default class CouponModels {
-  async find(couponInfo) {
-    let options = [{ isDeleted: false }];
-    if (couponInfo) {
-      options = couponInfo.map(x => {
-        return { id: x.couponId, isDeleted: false };
-      });
-    }
+  async findWithCouponInfoList(couponInfo) {
+    const options = couponInfo.map(x => {
+      return { id: x.couponId, isDeleted: false };
+    });
+
     return await getRepository(Coupon).find({
       where: options
     });
   }
-  async findOne(couponId, couponName, couponCode) {
-    const options = [];
-    if (couponId) options.push({ id: couponId });
-    if (couponName) options.push({ couponName });
-    if (couponCode) options.push({ couponCode });
+
+  async findAll() {
+    return await getRepository(Coupon).find({
+      where: {
+        isDeleted: false
+      }
+    });
+  }
+
+  async findOneWithCouponCode(couponCode) {
     return await getRepository(Coupon).findOne({
-      where: options
+      where: {
+        couponCode
+      }
+    });
+  }
+
+  async findOneWithCouponName(couponName) {
+    return await getRepository(Coupon).findOne({
+      where: {
+        couponName
+      }
+    });
+  }
+
+  async findOneWithCouponId(couponId) {
+    return await getRepository(Coupon).findOne({
+      where: {
+        id: couponId
+      }
     });
   }
 
   async save(couponData) {
     await getRepository(Coupon).save(couponData);
   }
+
   async findFilter(userCouponInfo) {
     return await getRepository(Coupon).find({
       select: ["id", "couponName", "couponCode"],

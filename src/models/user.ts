@@ -2,7 +2,7 @@ import { User } from "../database/entity/User";
 import { getRepository } from "typeorm";
 
 export default class UserModels {
-  async find(commentInfo) {
+  async findWithCommentInfoList(commentInfo) {
     return await getRepository(User).find({
       where: commentInfo.map(x => {
         return {
@@ -12,13 +12,39 @@ export default class UserModels {
     });
   }
 
-  async findOne(id, email, password) {
-    const options = {};
-    if (id) options["id"] = id;
-    if (email) options["email"] = email;
-    if (password) options["passowrd"] = password;
+  async findAllWithUserId(userIdList) {
+    return await getRepository(User).find({
+      select: ["id", "name"],
+      where: userIdList.map(userId => {
+        return {
+          id: userId
+        };
+      })
+    });
+  }
+
+  async findOneWithUserId(userId) {
     return await getRepository(User).findOne({
-      where: options
+      where: {
+        id: userId
+      }
+    });
+  }
+
+  async findOneWithEmail(email) {
+    return await getRepository(User).findOne({
+      where: {
+        email
+      }
+    });
+  }
+
+  async findOneAccount(email, password) {
+    return await getRepository(User).findOne({
+      where: {
+        email,
+        password
+      }
     });
   }
 
