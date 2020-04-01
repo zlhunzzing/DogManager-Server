@@ -13,6 +13,11 @@ export class Room {
   @Column()
   userId: number;
 
+  @Column({
+    default: true
+  })
+  adminCheck: boolean;
+
   @CreateDateColumn()
   createdAt: string;
 }
