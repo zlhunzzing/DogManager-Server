@@ -180,7 +180,7 @@ export default class UserService {
           email: result.email,
           isUser: true
         },
-        process.env.JWT_SECRET_KEY,
+        process.env.JWT_USER_SECRET_KEY,
         {
           expiresIn: "1h"
         }

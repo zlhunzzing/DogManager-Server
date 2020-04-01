@@ -4,14 +4,26 @@ import * as express from "express";
 import AdminController from "../controller/admin";
 const controller = new AdminController();
 const router = express.Router({ strict: true });
-import jwtMiddleware from "express-jwt-middleware";
 import AWS from "aws-sdk";
 import path from "path";
 import multer from "multer";
 import multerS3 from "multer-s3";
 AWS.config.loadFromPath(__dirname + "/../../awsconfig.json");
+import jwt from "jsonwebtoken";
 
-const jwtCheck = jwtMiddleware(process.env.JWT_SECRET_KEY);
+const jwtCheck = (req, res, next) => {
+  const token = req.headers.authorization;
+
+  jwt.verify(token, process.env.JWT_ADMIN_SECRET_KEY, (err, decoded) => {
+    if (err) {
+      res.status(403).json(err ? err : { message: "Wrong token!" });
+    } else {
+      req.tokenData = decoded;
+      next();
+    }
+  });
+};
+
 const s3 = new AWS.S3();
 const upload = multer({
   storage: multerS3({

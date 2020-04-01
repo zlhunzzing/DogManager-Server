@@ -146,7 +146,7 @@ export default class AdminService {
           email,
           isUser: false
         },
-        process.env.JWT_SECRET_KEY,
+        process.env.JWT_ADMIN_SECRET_KEY,
         {
           expiresIn: "1h"
         }
