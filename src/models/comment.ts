@@ -2,13 +2,13 @@ import { Comment } from "../database/entity/Comment";
 import { getRepository } from "typeorm";
 
 export default class CommentModels {
-  async find(eventId) {
+  async findWithEventId(eventId) {
     const options = { isDeleted: false };
     if (eventId) options["eventId"] = eventId;
     return await getRepository(Comment).find({ where: options });
   }
 
-  async findOne(commentId) {
+  async findOneWithCommentId(commentId) {
     return await getRepository(Comment).findOne({
       where: {
         id: commentId

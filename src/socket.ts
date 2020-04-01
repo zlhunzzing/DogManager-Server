@@ -39,6 +39,7 @@ const transformTime = async messages => {
 
 export default function socketInfo() {
   return socket => {
+    console.log("socket connected");
     socket.on("login", async data => {
       let tokenInfo;
       try {
@@ -48,9 +49,9 @@ export default function socketInfo() {
         console.log(err);
       }
       if (tokenInfo.isUser) {
-        const room = await roomModels.findOne(tokenInfo.id);
+        const room = await roomModels.findOneWithUserId(tokenInfo.id);
         if (room) {
-          const messages = await chatModels.find(room.id);
+          const messages = await chatModels.findWithRoomId(room.id);
           const result = await transformTime(messages);
           socket.emit("chatLog", result);
         } else {
@@ -58,8 +59,8 @@ export default function socketInfo() {
           socket.emit("chatLog", []);
         }
       } else {
-        const room = await roomModels.findOne(data.userId);
-        const messages = await chatModels.find(room.id);
+        const room = await roomModels.findOneWithUserId(data.userId);
+        const messages = await chatModels.findWithRoomId(room.id);
         const result = await transformTime(messages);
         socket.emit("chatLog", result);
       }
@@ -73,26 +74,26 @@ export default function socketInfo() {
         console.log(err);
       }
       if (tokenInfo.isUser) {
-        const room = await roomModels.findOne(tokenInfo.id);
+        const room = await roomModels.findOneWithUserId(tokenInfo.id);
         const chatData = {
           content: data.content,
           roomId: room.id,
           writer: "user"
         };
         await chatModels.save(chatData);
-        const messages = await chatModels.find(room.id);
+        const messages = await chatModels.findWithRoomId(room.id);
         const result = await transformTime(messages);
 
         socket.emit("chatLog", result);
       } else {
-        const room = await roomModels.findOne(data.userId);
+        const room = await roomModels.findOneWithUserId(data.userId);
         const chatData = {
           content: data.content,
           roomId: room.id,
           writer: "admin"
         };
         await chatModels.save(chatData);
-        const messages = await chatModels.find(room.id);
+        const messages = await chatModels.findWithRoomId(room.id);
         const result = await transformTime(messages);
         socket.emit("chatLog", result);
       }

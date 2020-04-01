@@ -1,18 +1,40 @@
 import { UserCoupon } from "../database/entity/UserCoupon";
 import { getRepository } from "typeorm";
 
+enum couponState {
+  enable,
+  disable,
+  canceled
+}
+
 export default class UserCouponModels {
-  async find(userId, couponId, isDeleted) {
-    const options = { isDeleted: false };
-    if (userId) options["userId"] = userId;
-    if (couponId) options["couponId"] = couponId;
-    if (isDeleted) options["isDeleted"] = isDeleted;
+  async findAll() {
     return await getRepository(UserCoupon).find({
-      where: options
+      where: {
+        isDeleted: couponState.enable
+      }
     });
   }
 
-  async findOne(userId, couponId) {
+  async findWithUserId(userId) {
+    return await getRepository(UserCoupon).find({
+      where: {
+        isDeleted: couponState.enable,
+        userId
+      }
+    });
+  }
+
+  async findWithCouponId(couponId) {
+    return await getRepository(UserCoupon).find({
+      where: {
+        couponId,
+        isDeleted: couponState.enable
+      }
+    });
+  }
+
+  async findOneWithId(userId, couponId) {
     return await getRepository(UserCoupon).findOne({
       where: {
         userId,

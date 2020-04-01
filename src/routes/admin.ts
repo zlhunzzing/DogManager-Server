@@ -82,4 +82,6 @@ router.get(
   controller.getUserCouponListController
 );
 
+router.get("/room/list", jwtCheck, controller.getRoomListController);
+
 export default router;

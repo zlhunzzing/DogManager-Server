@@ -130,4 +130,9 @@ export default class AdminController {
       id: tokenInfo.id
     });
   }
+
+  async getRoomListController(req: Req, res: Response): Promise<void> {
+    const result = await service.getRoomListService();
+    res.status(200).json(result);
+  }
 }
