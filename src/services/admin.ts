@@ -233,6 +233,9 @@ export default class AdminService {
       userIdList.push(roomList[i].userId);
     }
     const userInfoList = await userModels.findAllWithUserId(userIdList);
+    for (let i = 0; i < userInfoList.length; i++) {
+      userInfoList[i]["adminCheck"] = roomList[i].adminCheck;
+    }
     return { roomList: userInfoList };
   }
 }

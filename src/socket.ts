@@ -37,7 +37,7 @@ const transformTime = async messages => {
   return messages;
 };
 
-export default function socketInfo() {
+export default function socketInfo(nsp) {
   return socket => {
     console.log("socket connected");
     socket.on("login", async data => {
@@ -49,18 +49,27 @@ export default function socketInfo() {
         console.log(err);
       }
       if (tokenInfo.isUser) {
-        const room = await roomModels.findOneWithUserId(tokenInfo.id);
-        if (room) {
-          const messages = await chatModels.findWithRoomId(room.id);
+        const roomInfo = await roomModels.findOneWithUserId(tokenInfo.id);
+        if (roomInfo) {
+          const room = (socket.room = roomInfo.id);
+          socket.join(room);
+          const messages = await chatModels.findWithRoomId(roomInfo.id);
           const result = await transformTime(messages);
           socket.emit("chatLog", result);
         } else {
           await roomModels.save({ userId: tokenInfo.id });
+          const roomInfo2 = await roomModels.findOneWithUserId(tokenInfo.id);
+          const room = (socket.room = roomInfo2.id);
+          socket.join(room);
           socket.emit("chatLog", []);
         }
+
+        // 관리자일때
       } else {
-        const room = await roomModels.findOneWithUserId(data.userId);
-        const messages = await chatModels.findWithRoomId(room.id);
+        const roomInfo = await roomModels.findOneWithUserId(data.userId);
+        const room = (socket.room = roomInfo.id);
+        socket.join(room);
+        const messages = await chatModels.findWithRoomId(roomInfo.id);
         const result = await transformTime(messages);
         socket.emit("chatLog", result);
       }
@@ -74,28 +83,37 @@ export default function socketInfo() {
         console.log(err);
       }
       if (tokenInfo.isUser) {
-        const room = await roomModels.findOneWithUserId(tokenInfo.id);
+        const roomInfo = await roomModels.findOneWithUserId(tokenInfo.id);
+        const room = (socket.room = roomInfo.id);
+        socket.join(room);
         const chatData = {
           content: data.content,
-          roomId: room.id,
+          roomId: roomInfo.id,
           writer: "user"
         };
         await chatModels.save(chatData);
-        const messages = await chatModels.findWithRoomId(room.id);
+        roomInfo.adminCheck = false;
+        await roomModels.save(roomInfo);
+        const messages = await chatModels.findWithRoomId(roomInfo.id);
         const result = await transformTime(messages);
 
-        socket.emit("chatLog", result);
+        nsp.to(room).emit("chatLog", result);
+        // 관리자일때
       } else {
-        const room = await roomModels.findOneWithUserId(data.userId);
+        const roomInfo = await roomModels.findOneWithUserId(data.userId);
+        roomInfo.adminCheck = true;
+        await roomModels.save(roomInfo);
+        const room = (socket.room = roomInfo.id);
+        socket.join(room);
         const chatData = {
           content: data.content,
-          roomId: room.id,
+          roomId: roomInfo.id,
           writer: "admin"
         };
         await chatModels.save(chatData);
-        const messages = await chatModels.findWithRoomId(room.id);
+        const messages = await chatModels.findWithRoomId(roomInfo.id);
         const result = await transformTime(messages);
-        socket.emit("chatLog", result);
+        nsp.to(room).emit("chatLog", result);
       }
     });
     socket.on("disconnect", () => {

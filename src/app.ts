@@ -7,7 +7,7 @@ import { createTypeormConnection } from "./utils/createTypeormConnection";
 import morgan from "morgan";
 import http from "http";
 import socketIo from "socket.io";
-import socektInfo from "./socket";
+import socketInfo from "./socket";
 
 const app = express();
 const server = http.createServer(app);
@@ -29,9 +29,9 @@ if (process.env.NODE_ENV !== "test") {
   createTypeormConnection();
   app.use(morgan("dev"));
 }
-
+// const socket = socketInfo().bind(null, null, io);
 const nsp = io.of("/chat");
-nsp.on("connection", socektInfo());
+nsp.on("connection", socketInfo(nsp));
 
 app.use("/api/user", userRouter);
 app.use("/api/admin", adminRouter);
