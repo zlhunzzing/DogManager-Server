@@ -37,10 +37,10 @@ export class Events {
   pageImage: string;
 
   @CreateDateColumn()
-  createdAt: string;
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: string;
+  updatedAt: Date;
 
   // type boolean으로 바꾸는거 논의해보기
   @Column({

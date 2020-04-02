@@ -2,19 +2,9 @@ import dotenv from "dotenv";
 dotenv.config();
 import { Request, Response } from "express";
 import UserService from "../../services/user";
+import { Req } from "../../common/interface";
+
 const service = new UserService();
-
-interface TokenData {
-  id: number;
-  email: string;
-  isUser: boolean;
-  iat: number;
-  exp: number;
-}
-
-interface Req extends Request {
-  tokenData: TokenData;
-}
 
 export default class UserController {
   async getEventListController(req: Request, res: Response): Promise<void> {
@@ -28,20 +18,20 @@ export default class UserController {
   }
 
   async signupController(req: Request, res: Response): Promise<void> {
-    const result = await service.signupService(req.body);
-    if (result["key"] === "already exist") {
-      res.status(409).send("email already exist");
-    } else {
+    try {
+      await service.signupService(req.body);
       res.status(201).end();
+    } catch (err) {
+      res.status(409).send(err.message);
     }
   }
 
   async signinController(req: Request, res: Response): Promise<void> {
-    const result = await service.signinService(req.body);
-    if (result["key"] === "unvalid user") {
-      res.status(409).send("unvalid user");
-    } else {
-      res.status(200).json({ token: result["key"], userId: result["id"] });
+    try {
+      const result = await service.signinService(req.body);
+      res.status(200).json(result);
+    } catch (err) {
+      res.status(409).send(err.message);
     }
   }
 
@@ -55,11 +45,11 @@ export default class UserController {
 
   async addCouponController(req: Req, res: Response): Promise<void> {
     const tokenInfo = req.tokenData;
-    const result = await service.addCouponService(req.body, tokenInfo);
-    if (result["key"] === "success") {
+    try {
+      await service.addCouponService(req.body, tokenInfo);
       res.status(201).send("success");
-    } else {
-      res.status(409).send("duplicate");
+    } catch (err) {
+      res.status(409).send(err.message);
     }
   }
 

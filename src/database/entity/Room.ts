@@ -19,5 +19,5 @@ export class Room {
   adminCheck: boolean;
 
   @CreateDateColumn()
-  createdAt: string;
+  createdAt: Date;
 }

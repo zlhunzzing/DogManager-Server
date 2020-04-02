@@ -32,8 +32,8 @@ export class Comment {
   isDeleted: boolean;
 
   @CreateDateColumn()
-  createdAt: string;
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: string;
+  updatedAt: Date;
 }

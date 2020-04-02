@@ -20,5 +20,5 @@ export class Chat {
   writer: string;
 
   @CreateDateColumn()
-  createdAt: string;
+  createdAt: Date;
 }

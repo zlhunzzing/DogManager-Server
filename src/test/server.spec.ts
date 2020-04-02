@@ -14,8 +14,15 @@ import { User } from "../database/entity/User";
 import { UserCoupon } from "../database/entity/UserCoupon";
 import { Comment } from "../database/entity/Comment";
 import { UserThumbs } from "../database/entity/UserThumbs";
+import { Room } from "../database/entity/Room";
 import { getRepository } from "typeorm";
 import crypto from "crypto";
+
+// import socketIo from "socket.io";
+// import http from "http";
+// const server = http.createServer(app);
+// const io = socketIo(server);
+import io from "socket.io-client";
 
 const dataForCreateEvent = (num: number = 1): object => {
   return {
@@ -669,7 +676,7 @@ describe("Implemented testcase", () => {
         const agent = chai.request.agent(app);
         agent
           .get("/api/admin/user/coupon/list")
-          .set("Authorization", userToken)
+          .set("Authorization", adminToken)
           .end((err, res) => {
             if (err) done(err);
             expect(res).to.have.status(200);
@@ -681,7 +688,7 @@ describe("Implemented testcase", () => {
               "couponCode",
               "assignedAt",
               "expiredAt",
-              "isDeleted"
+              "couponState"
             ]);
             done();
           });
@@ -749,7 +756,7 @@ describe("Implemented testcase", () => {
     });
 
     describe("DELETE /api/user/comment/entry/:commentId", () => {
-      //삭제할 댓글을 생성
+      // 삭제할 댓글을 생성
       beforeEach(async () => {
         const data = dataForCreateEvent(1);
         await getRepository(Events).save(data);
@@ -852,4 +859,30 @@ describe("Implemented testcase", () => {
       });
     });
   });
+
+  //   describe("CHATING TEST", () => {
+  //     describe("User EMIT login", () => {
+  //       it("should login and receive data", done => {
+  //         const socket = io.connect("http://localhost:3002/chat", {
+  //           path: "/socket.io"
+  //         });
+  //         socket.emit("login", { token: userToken });
+  //         socket.on("chatLog", data => {
+  //           expect(data).to.have.length(0);
+  //           done();
+  //         });
+  //       });
+  //       it("should send message and receive chatLog", done => {
+  //         const socket = io.connect("http://localhost:3002/chat", {
+  //           path: "/socket.io"
+  //         });
+  //         socket.emit("chat", { token: userToken, content: "this is test" });
+  //         socket.on("chatLog", data => {
+  //           console.log(data);
+  //           expect(data).to.have.length(1);
+  //           done();
+  //         });
+  //       });
+  //     });
+  //   });
 });
