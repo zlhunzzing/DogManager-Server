@@ -1,17 +1,13 @@
 import { UserCoupon } from "../database/entity/UserCoupon";
 import { getRepository } from "typeorm";
 
-enum couponState {
-  enable,
-  disable,
-  canceled
-}
+import { COUPON_STATE } from "../common/enum";
 
 export default class UserCouponModels {
   async findAll() {
     return await getRepository(UserCoupon).find({
       where: {
-        isDeleted: couponState.enable
+        couponState: COUPON_STATE.ENABLE.toString()
       }
     });
   }
@@ -19,7 +15,7 @@ export default class UserCouponModels {
   async findWithUserId(userId) {
     return await getRepository(UserCoupon).find({
       where: {
-        isDeleted: couponState.enable,
+        couponState: COUPON_STATE.ENABLE.toString(),
         userId
       }
     });
@@ -29,7 +25,7 @@ export default class UserCouponModels {
     return await getRepository(UserCoupon).find({
       where: {
         couponId,
-        isDeleted: couponState.enable
+        couponState: COUPON_STATE.ENABLE.toString()
       }
     });
   }

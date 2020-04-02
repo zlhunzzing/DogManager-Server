@@ -9,6 +9,10 @@ import {
   UserCouponModels,
   RoomModels
 } from "../models";
+import { COUPON_STATE } from "../common/enum";
+import { EventData, CouponData, SigninData } from "../common/interface";
+import moment from "moment";
+import { ERROR_MESSAGE } from "../common/ErrorMessages";
 
 const adminModels = new AdminModels();
 const couponModels = new CouponModels();
@@ -17,55 +21,14 @@ const userModels = new UserModels();
 const userCouponModels = new UserCouponModels();
 const roomModels = new RoomModels();
 
-enum couponState {
-  enable,
-  disable,
-  canceled
-}
-
-interface EventData {
-  eventTitle: string;
-  startDate: string;
-  endDate: string;
-  detailPageUrl: string;
-  couponCode: string;
-  buttonImage: string;
-  bannerImage: string;
-  pageImage: string;
-  email: string;
-  password: string;
-}
-
-interface CouponData {
-  couponName: string;
-  couponCode: string;
-  description: string;
-  period: number;
-  discount: string;
-}
-
-const getTime = time => {
-  const year = time.getFullYear();
-  let month = (time.getMonth() + 1).toString();
-  month = Number(month) < 10 ? "0" + month : month;
-  let date = time.getDate();
-  date = Number(date) < 10 ? "0" + date : date;
-  let hour = time.getHours();
-  hour = Number(hour) < 10 ? "0" + hour : hour;
-  let minute = time.getMinutes();
-  minute = Number(minute) < 10 ? "0" + minute : minute;
-  const result2 = "" + year + month + date + hour + minute;
-  return result2;
-};
-
 export default class AdminService {
-  async addEventService(eventData: EventData): Promise<object> {
+  async addEventService(eventData: EventData): Promise<void> {
     const inData = await eventsModels.findOneWithEventUrl(
       eventData.detailPageUrl
     );
     if (inData) {
       if (inData.detailPageUrl === eventData.detailPageUrl) {
-        return { key: "detailPageUrl" };
+        throw new Error(ERROR_MESSAGE.OVERLAP_DETAIL_PAGE_URL);
       }
     }
 
@@ -75,13 +38,9 @@ export default class AdminService {
       couponCode: eventData.couponCode ? eventData.couponCode : null
     };
     await eventsModels.save(forInsertData);
-    return { key: "completed" };
   }
 
-  async putEventService(
-    eventData: EventData,
-    eventId: string
-  ): Promise<object> {
+  async putEventService(eventData: EventData, eventId: string): Promise<void> {
     const result = await eventsModels.findOneWithEventId(eventId);
 
     if (result.detailPageUrl !== eventData.detailPageUrl) {
@@ -90,7 +49,7 @@ export default class AdminService {
       );
       if (inData) {
         if (inData.detailPageUrl === eventData.detailPageUrl) {
-          return { key: "detailPageUrl" };
+          throw new Error(ERROR_MESSAGE.OVERLAP_DETAIL_PAGE_URL);
         }
       }
     }
@@ -106,7 +65,6 @@ export default class AdminService {
       pageImage: eventData.pageImage ? eventData.pageImage : result.pageImage
     };
     await eventsModels.save(updatedResult);
-    return { key: "completed" };
   }
 
   async getEventListService(): Promise<object> {
@@ -134,7 +92,7 @@ export default class AdminService {
     await eventsModels.save(result);
   }
 
-  async signinService(adminInfo: EventData): Promise<object> {
+  async signinService(adminInfo: SigninData): Promise<object> {
     const { email, password } = adminInfo;
 
     const result = await adminModels.findOneAccount(email, password);
@@ -151,25 +109,25 @@ export default class AdminService {
           expiresIn: "1h"
         }
       );
-      return { key: token };
+      return { token };
     } else {
-      return { key: "unvalid user" };
+      throw new Error(ERROR_MESSAGE.WRONG_USER_INFO);
     }
   }
 
-  async createCouponService(couponData: CouponData): Promise<object> {
+  async createCouponService(couponData: CouponData): Promise<void> {
     const result = await couponModels.findOneWithCouponName(
       couponData.couponName
     );
     if (result) {
-      return { key: "couponName already exist" };
+      throw new Error(ERROR_MESSAGE.OVERLAP_COUPON_NAME);
     }
 
     const result2 = await couponModels.findOneWithCouponCode(
       couponData.couponCode
     );
     if (result2) {
-      return { key: "couponCode already exist" };
+      throw new Error(ERROR_MESSAGE.OVERLAP_COUPON_CODE);
     }
     await couponModels.save(couponData);
   }
@@ -189,7 +147,7 @@ export default class AdminService {
     // couponState.canceled 로 변경
     const UserCouponList = await userCouponModels.findWithCouponId(result.id);
     const couponListForCancel = await UserCouponList.map(x => {
-      x.isDeleted = couponState.canceled;
+      x.couponState = COUPON_STATE.CANCELED;
       return x;
     });
     await userCouponModels.save(couponListForCancel);
@@ -210,8 +168,8 @@ export default class AdminService {
         return y.id === x.couponId;
       });
 
-      const time = new Date(x.createdAt.toString());
-      const timeData = getTime(time);
+      const m = moment(new Date(x.createdAt));
+      const timeData = m.format("YYYYMMDDHHmm");
 
       return {
         userName: filteredUserInfo[0].name,
@@ -220,10 +178,10 @@ export default class AdminService {
         couponCode: filteredCouponInfo[0].couponCode,
         assignedAt: timeData,
         expiredAt: x.expiredAt,
-        isDeleted: x.isDeleted
+        couponState: x.couponState
       };
     });
-    return { key: result };
+    return { couponList: result };
   }
 
   async getRoomListService(): Promise<object> {

@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
-
+import moment from "moment";
 import {
   CommentModels,
   CouponModels,
@@ -11,6 +11,9 @@ import {
   UserCouponModels,
   UserThumbsModels
 } from "../models";
+import { ERROR_MESSAGE } from "../common/ErrorMessages";
+import { COUPON_STATE } from "../common/enum";
+import { SigninData, SignupData, CouponData } from "../common/interface";
 
 const commentModels = new CommentModels();
 const couponModels = new CouponModels();
@@ -18,60 +21,6 @@ const eventsModels = new EventsModels();
 const userModels = new UserModels();
 const userCouponModels = new UserCouponModels();
 const userThumbsModels = new UserThumbsModels();
-
-enum couponState {
-  enable,
-  disable,
-  canceled
-}
-
-interface SignupData {
-  name: string;
-  email: string;
-  password: string;
-  mobile: string;
-  address: string;
-}
-
-interface SigninData {
-  email: string;
-  password: string;
-}
-
-const getRecentTime = () => {
-  const now = new Date();
-  const year = now.getFullYear();
-  let month = (now.getMonth() + 1).toString();
-  month = Number(month) < 10 ? "0" + month : month;
-  const date = now.getDate();
-  const hour = now.getHours();
-  const minute = now.getMinutes();
-  const result = "" + year + month + date + hour + minute;
-  return result;
-};
-
-const getTime = time => {
-  const year = time.getFullYear();
-  let month = (time.getMonth() + 1).toString();
-  month = Number(month) < 10 ? "0" + month : month;
-  let date = time.getDate();
-  date = Number(date) < 10 ? "0" + date : date;
-  let hour = time.getHours();
-  hour = Number(hour) < 10 ? "0" + hour : hour;
-  let minute = time.getMinutes();
-  minute = Number(minute) < 10 ? "0" + minute : minute;
-  const result2 = "" + year + month + date + hour + minute;
-  return result2;
-};
-
-interface CouponData {
-  couponName: string;
-  couponCode: string;
-  description: string;
-  period: number;
-  discount: string;
-  expiredAt: string;
-}
 
 const makeCommentList = async (eventUrl, commentId) => {
   let eventInfo;
@@ -89,8 +38,8 @@ const makeCommentList = async (eventUrl, commentId) => {
     const filteredUserInfo = userInfo.filter(y => {
       return y.id === x.userId;
     });
-    const time = new Date(x.createdAt.toString());
-    const timeData = getTime(time);
+    const m = moment(new Date(x.createdAt));
+    const timeData = m.format("YYYYMMDDHHmm");
     return {
       id: x.id,
       content: x.content,
@@ -152,17 +101,16 @@ export default class UserService {
     return result;
   }
 
-  async signupService(userInfo: SignupData): Promise<object> {
+  async signupService(userInfo: SignupData): Promise<void> {
     const result = await userModels.findOneWithEmail(userInfo.email);
     if (result) {
-      return { key: "already exist" };
+      throw new Error(ERROR_MESSAGE.OVERLAP_USER_EMAIL);
     }
     const shasum = crypto.createHmac("sha512", process.env.CRYPTO_SECRET_KEY);
     shasum.update(userInfo.password);
     userInfo.password = shasum.digest("hex");
 
     await userModels.save(userInfo);
-    return { key: "completed" };
   }
 
   async signinService(userInfo: SigninData): Promise<object> {
@@ -185,22 +133,23 @@ export default class UserService {
           expiresIn: "1h"
         }
       );
-      return { key: token, id: result.id };
+      return { token, userId: result.id };
     } else {
-      return { key: "unvalid user" };
+      throw new Error(ERROR_MESSAGE.WRONG_USER_INFO);
     }
   }
 
   async getCouponListService(tokenInfo): Promise<object> {
     const userInfo = await userModels.findOneWithUserId(tokenInfo.id);
     const userCouponInfo = await userCouponModels.findWithUserId(userInfo.id);
-    const recentTime = getRecentTime();
+    const m = moment(new Date());
+    const recentTime = m.format("YYYYMMDDHHmm");
     const filteredUserCouponInfo = [];
     await userCouponInfo.forEach(async x => {
       if (Number(x.expiredAt) > Number(recentTime)) {
         filteredUserCouponInfo.push(x);
       } else {
-        x.isDeleted = couponState.canceled;
+        x.couponState = COUPON_STATE.CANCELED;
         await userCouponModels.save(x);
       }
     });
@@ -218,7 +167,7 @@ export default class UserService {
     return result;
   }
 
-  async addCouponService(couponData: CouponData, tokenInfo): Promise<object> {
+  async addCouponService(couponData: CouponData, tokenInfo): Promise<void> {
     const coupon = await couponModels.findOneWithCouponCode(
       couponData.couponCode
     );
@@ -228,7 +177,7 @@ export default class UserService {
       coupon.id
     );
     if (inData) {
-      return { key: "duplicate" };
+      throw new Error(ERROR_MESSAGE.OVERLAP_COUPON);
     }
     // 쿠폰을 생성
     const forInsertData = {
@@ -237,7 +186,6 @@ export default class UserService {
       expiredAt: couponData.expiredAt
     };
     await userCouponModels.save(forInsertData);
-    return { key: "success" };
   }
 
   async deleteCommentService(commentId): Promise<object> {

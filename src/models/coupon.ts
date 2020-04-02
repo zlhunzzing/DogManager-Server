@@ -1,10 +1,11 @@
 import { Coupon } from "../database/entity/Coupon";
 import { getRepository } from "typeorm";
+import { COUPON_STATE } from "../common/enum";
 
 export default class CouponModels {
   async findWithCouponInfoList(couponInfo) {
     const options = couponInfo.map(x => {
-      return { id: x.couponId, isDeleted: false };
+      return { id: x.couponId, couponState: COUPON_STATE.ENABLE.toString() };
     });
 
     return await getRepository(Coupon).find({
