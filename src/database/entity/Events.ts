@@ -22,9 +22,7 @@ export class Events {
   })
   endDate: string;
 
-  @Column({
-    nullable: true
-  })
+  @Column()
   detailPageUrl: string;
 
   @Column()
@@ -49,8 +47,6 @@ export class Events {
   })
   isDeleted: boolean;
 
-  @Column({
-    nullable: true
-  })
+  @Column()
   couponCode: string;
 }

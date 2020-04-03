@@ -1,17 +1,18 @@
 import dotenv from "dotenv";
-dotenv.config();
-import * as express from "express";
+import express from "express";
 import UserController from "../controller/user";
+import jwt from "jsonwebtoken";
+import { ERROR_MESSAGE } from "../common/ErrorMessages";
+
+dotenv.config();
 const controller = new UserController();
 const router = express.Router({ strict: true });
-import jwt from "jsonwebtoken";
 
 const jwtCheck = (req, res, next) => {
   const token = req.headers.authorization;
-
   jwt.verify(token, process.env.JWT_USER_SECRET_KEY, (err, decoded) => {
     if (err) {
-      res.status(403).json(err ? err : { message: "Wrong token!" });
+      res.status(403).json(err ? err : { message: ERROR_MESSAGE.WRONG_TOKEN });
     } else {
       req.tokenData = decoded;
       next();

@@ -19,7 +19,7 @@ app.use(
   cors({
     origin: [
       "http://dogandcodemate.s3-website.ap-northeast-2.amazonaws.com",
-      "http://localhost:3002",
+      "http://localhost:3000",
       "http://shortly-client.s3-website.ap-northeast-2.amazonaws.com"
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],

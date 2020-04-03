@@ -1,22 +1,23 @@
 import dotenv from "dotenv";
-dotenv.config();
-import * as express from "express";
+import express from "express";
 import AdminController from "../controller/admin";
-const controller = new AdminController();
-const router = express.Router({ strict: true });
 import AWS from "aws-sdk";
 import path from "path";
 import multer from "multer";
 import multerS3 from "multer-s3";
-AWS.config.loadFromPath(__dirname + "/../../awsconfig.json");
 import jwt from "jsonwebtoken";
+import { ERROR_MESSAGE } from "../common/ErrorMessages";
+
+dotenv.config();
+AWS.config.loadFromPath(__dirname + "/../../awsconfig.json");
+const controller = new AdminController();
+const router = express.Router({ strict: true });
 
 const jwtCheck = (req, res, next) => {
   const token = req.headers.authorization;
-
   jwt.verify(token, process.env.JWT_ADMIN_SECRET_KEY, (err, decoded) => {
     if (err) {
-      res.status(403).json(err ? err : { message: "Wrong token!" });
+      res.status(403).json(err ? err : { message: ERROR_MESSAGE.WRONG_TOKEN });
     } else {
       req.tokenData = decoded;
       next();
@@ -36,7 +37,6 @@ const upload = multer({
     acl: "public-read-write",
     limits: { fileSize: 5 * 1024 * 1024 }
   })
-  // dest: "../uploads"
 });
 
 const option = [

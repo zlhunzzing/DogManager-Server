@@ -5,5 +5,6 @@ export const ERROR_MESSAGE = {
   OVERLAP_COUPON_CODE: "couponCode already exist",
   OVERLAP_USER_EMAIL: "already exist",
   OVERLAP_COUPON: "duplicate",
-  OVERLAP_DETAIL_PAGE_URL: "detailPageUrl"
+  OVERLAP_DETAIL_PAGE_URL: "detailPageUrl",
+  WRONG_TOKEN: "Wrong token!"
 };

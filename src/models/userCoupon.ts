@@ -1,6 +1,5 @@
 import { UserCoupon } from "../database/entity/UserCoupon";
 import { getRepository } from "typeorm";
-
 import { COUPON_STATE } from "../common/enum";
 
 export default class UserCouponModels {
