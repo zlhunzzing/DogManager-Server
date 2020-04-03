@@ -31,8 +31,14 @@ export default class AdminService {
         throw new Error(ERROR_MESSAGE.OVERLAP_DETAIL_PAGE_URL);
       }
     }
-
-    await eventsModels.save(eventData);
+    // console.log("eventData", eventData);
+    // await eventsModels.save(eventData);
+    const forInsertData = {
+      ...eventData,
+      detailPageUrl: eventData.detailPageUrl ? eventData.detailPageUrl : null,
+      couponCode: eventData.couponCode ? eventData.couponCode : null
+    };
+    await eventsModels.save(forInsertData);
   }
 
   async putEventService(eventData: EventData, eventId: string): Promise<void> {
@@ -75,7 +81,7 @@ export default class AdminService {
     const couponListInfo = await couponModels.findAll();
     const result = {
       ...eventInfo,
-      couponName: couponInfo.couponName,
+      couponName: couponInfo ? couponInfo.couponName : null,
       couponList: couponListInfo ? couponListInfo : null
     };
     return result;
