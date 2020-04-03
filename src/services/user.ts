@@ -1,8 +1,10 @@
 import dotenv from "dotenv";
-dotenv.config();
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import moment from "moment";
+import { ERROR_MESSAGE } from "../common/ErrorMessages";
+import { COUPON_STATE } from "../common/enum";
+import { SigninData, SignupData, CouponData } from "../common/interface";
 import {
   CommentModels,
   CouponModels,
@@ -11,10 +13,8 @@ import {
   UserCouponModels,
   UserThumbsModels
 } from "../models";
-import { ERROR_MESSAGE } from "../common/ErrorMessages";
-import { COUPON_STATE } from "../common/enum";
-import { SigninData, SignupData, CouponData } from "../common/interface";
 
+dotenv.config();
 const commentModels = new CommentModels();
 const couponModels = new CouponModels();
 const eventsModels = new EventsModels();
@@ -26,7 +26,6 @@ const makeCommentList = async (eventUrl, commentId) => {
   let eventInfo;
   if (eventUrl === null) {
     const commentEvent = await commentModels.findOneWithCommentId(commentId);
-
     eventInfo = await eventsModels.findOneWithEventId(commentEvent.eventId);
   } else {
     eventInfo = await eventsModels.findOneWithEventUrl(`/${eventUrl}`);
@@ -81,21 +80,21 @@ const makeUserThumbsList = async (eventUrl, commentId, userInfo) => {
 export default class UserService {
   async getEventListService(): Promise<object> {
     const result = await eventsModels.findAll();
-    return result;
+    return { eventList: result };
   }
 
   async getEventEntryService(eventUrl: string): Promise<object> {
     const eventInfo = await eventsModels.findOneWithEventUrl(`/${eventUrl}`);
 
     const couponInfo = await couponModels.findOneWithCouponCode(
-      eventInfo.couponCode ? eventInfo.couponCode : null
+      eventInfo.couponCode
     );
 
     const commentListInfo = await makeCommentList(eventUrl, null);
 
     const result = {
       ...eventInfo,
-      period: couponInfo ? couponInfo.period : null,
+      period: couponInfo.period,
       commentList: commentListInfo
     };
     return result;
@@ -142,8 +141,10 @@ export default class UserService {
   async getCouponListService(tokenInfo): Promise<object> {
     const userInfo = await userModels.findOneWithUserId(tokenInfo.id);
     const userCouponInfo = await userCouponModels.findWithUserId(userInfo.id);
+
     const m = moment(new Date());
     const recentTime = m.format("YYYYMMDDHHmm");
+
     const filteredUserCouponInfo = [];
     await userCouponInfo.forEach(async x => {
       if (Number(x.expiredAt) > Number(recentTime)) {
@@ -172,20 +173,20 @@ export default class UserService {
       couponData.couponCode
     );
     // // 조회한 쿠폰을 이미 가지고 있을 경우 중복처리
-    const inData = await userCouponModels.findOneWithId(
+    const userCoupon = await userCouponModels.findOneWithId(
       tokenInfo.id,
       coupon.id
     );
-    if (inData) {
+    if (userCoupon) {
       throw new Error(ERROR_MESSAGE.OVERLAP_COUPON);
     }
     // 쿠폰을 생성
-    const forInsertData = {
+    const newCouponData = {
       couponId: coupon.id,
       userId: tokenInfo.id,
       expiredAt: couponData.expiredAt
     };
-    await userCouponModels.save(forInsertData);
+    await userCouponModels.save(newCouponData);
   }
 
   async deleteCommentService(commentId): Promise<object> {
@@ -237,11 +238,11 @@ export default class UserService {
     comment.thumb++;
     await commentModels.save(comment);
 
-    const forInsertData = {
+    const thumbData = {
       userId: tokenInfo.id,
       commentId
     };
-    await userThumbsModels.save(forInsertData);
+    await userThumbsModels.save(thumbData);
     const commentIdArr = await makeUserThumbsList(null, commentId, tokenInfo);
     const commentListInfo = await makeCommentList(null, commentId);
 

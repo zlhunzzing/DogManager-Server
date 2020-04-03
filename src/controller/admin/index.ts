@@ -1,9 +1,9 @@
 import dotenv from "dotenv";
-dotenv.config();
 import { Request, Response } from "express";
 import adminService from "../../services/admin";
 import { MulterFile, Req } from "../../common/interface";
 
+dotenv.config();
 const service = new adminService();
 
 export default class AdminController {
@@ -12,7 +12,7 @@ export default class AdminController {
     res: Response
   ): Promise<void> {
     const eventData = req.body;
-    if (req.files["pageImage"]) {
+    if (process.env.NODE_ENV !== "test") {
       eventData.pageImage = req.files["pageImage"][0].location;
       eventData.bannerImage = req.files["bannerImage"][0].location;
       eventData.buttonImage = req.files["buttonImage"][0].location;
@@ -103,9 +103,8 @@ export default class AdminController {
   }
 
   async getAdminIdController(req: Req, res: Response): Promise<void> {
-    const tokenInfo = req.tokenData;
     res.status(200).json({
-      id: tokenInfo.id
+      id: req.tokenData.id
     });
   }
 

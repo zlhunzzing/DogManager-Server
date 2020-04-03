@@ -1,6 +1,9 @@
 import dotenv from "dotenv";
-dotenv.config();
 import jwt from "jsonwebtoken";
+import { COUPON_STATE } from "../common/enum";
+import { EventData, CouponData, SigninData } from "../common/interface";
+import { ERROR_MESSAGE } from "../common/ErrorMessages";
+import moment from "moment";
 import {
   AdminModels,
   CouponModels,
@@ -9,11 +12,8 @@ import {
   UserCouponModels,
   RoomModels
 } from "../models";
-import { COUPON_STATE } from "../common/enum";
-import { EventData, CouponData, SigninData } from "../common/interface";
-import moment from "moment";
-import { ERROR_MESSAGE } from "../common/ErrorMessages";
 
+dotenv.config();
 const adminModels = new AdminModels();
 const couponModels = new CouponModels();
 const eventsModels = new EventsModels();
@@ -23,37 +23,32 @@ const roomModels = new RoomModels();
 
 export default class AdminService {
   async addEventService(eventData: EventData): Promise<void> {
-    const inData = await eventsModels.findOneWithEventUrl(
+    const event = await eventsModels.findOneWithEventUrl(
       eventData.detailPageUrl
     );
-    if (inData) {
-      if (inData.detailPageUrl === eventData.detailPageUrl) {
+    if (event) {
+      if (event.detailPageUrl === eventData.detailPageUrl) {
         throw new Error(ERROR_MESSAGE.OVERLAP_DETAIL_PAGE_URL);
       }
     }
 
-    const forInsertData = {
-      ...eventData,
-      detailPageUrl: eventData.detailPageUrl ? eventData.detailPageUrl : null,
-      couponCode: eventData.couponCode ? eventData.couponCode : null
-    };
-    await eventsModels.save(forInsertData);
+    await eventsModels.save(eventData);
   }
 
   async putEventService(eventData: EventData, eventId: string): Promise<void> {
     const result = await eventsModels.findOneWithEventId(eventId);
 
     if (result.detailPageUrl !== eventData.detailPageUrl) {
-      const inData = await eventsModels.findOneWithEventUrl(
+      const event = await eventsModels.findOneWithEventUrl(
         eventData.detailPageUrl
       );
-      if (inData) {
-        if (inData.detailPageUrl === eventData.detailPageUrl) {
+      if (event) {
+        if (event.detailPageUrl === eventData.detailPageUrl) {
           throw new Error(ERROR_MESSAGE.OVERLAP_DETAIL_PAGE_URL);
         }
       }
     }
-    const updatedResult = {
+    const updatedEvent = {
       ...result,
       ...eventData,
       buttonImage: eventData.buttonImage
@@ -64,7 +59,7 @@ export default class AdminService {
         : result.bannerImage,
       pageImage: eventData.pageImage ? eventData.pageImage : result.pageImage
     };
-    await eventsModels.save(updatedResult);
+    await eventsModels.save(updatedEvent);
   }
 
   async getEventListService(): Promise<object> {
@@ -80,7 +75,7 @@ export default class AdminService {
     const couponListInfo = await couponModels.findAll();
     const result = {
       ...eventInfo,
-      couponName: couponInfo ? couponInfo.couponName : null,
+      couponName: couponInfo.couponName,
       couponList: couponListInfo ? couponListInfo : null
     };
     return result;

@@ -3,9 +3,12 @@ import { getRepository } from "typeorm";
 
 export default class CommentModels {
   async findWithEventId(eventId) {
-    const options = { isDeleted: false };
-    if (eventId) options["eventId"] = eventId;
-    return await getRepository(Comment).find({ where: options });
+    return await getRepository(Comment).find({
+      where: {
+        isDeleted: false,
+        eventId
+      }
+    });
   }
 
   async findOneWithCommentId(commentId) {

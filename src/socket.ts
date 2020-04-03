@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import jwt from "jsonwebtoken";
 import { RoomModels, ChatModels } from "./models";
+import moment from "moment";
 
 const roomModels = new RoomModels();
 const chatModels = new ChatModels();
@@ -19,24 +20,10 @@ const verifyToken = (token, secretKeyList) => {
   });
 };
 
-const getTime = time => {
-  const year = time.getFullYear();
-  let month = (time.getMonth() + 1).toString();
-  month = Number(month) < 10 ? "0" + month : month;
-  let date = time.getDate();
-  date = Number(date) < 10 ? "0" + date : date;
-  let hour = time.getHours();
-  hour = Number(hour) < 10 ? "0" + hour : hour;
-  let minute = time.getMinutes();
-  minute = Number(minute) < 10 ? "0" + minute : minute;
-  const result2 = "" + year + month + date + hour + minute;
-  return result2;
-};
-
 const transformTime = async messages => {
   for (let i = 0; i < messages.length; i++) {
-    const time = new Date(messages[i].createdAt);
-    messages[i].createdAt = await getTime(time);
+    const m = moment(new Date(messages[i].createdAt));
+    messages[i].createdAt = m.format("YYYYMMDDHHmm");
   }
   return messages;
 };
@@ -53,7 +40,7 @@ export default function socketInfo(nsp) {
         ]);
       } catch (err) {
         nsp.emit("error", err);
-        console.log(err);
+        // console.log(err);
       }
       if (tokenInfo.isUser) {
         const roomInfo = await roomModels.findOneWithUserId(tokenInfo.id);
