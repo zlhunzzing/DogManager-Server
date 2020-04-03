@@ -87,14 +87,14 @@ export default class UserService {
     const eventInfo = await eventsModels.findOneWithEventUrl(`/${eventUrl}`);
 
     const couponInfo = await couponModels.findOneWithCouponCode(
-      eventInfo.couponCode
+      eventInfo.couponCode ? eventInfo.couponCode : null
     );
 
     const commentListInfo = await makeCommentList(eventUrl, null);
 
     const result = {
       ...eventInfo,
-      period: couponInfo.period,
+      period: couponInfo ? couponInfo.period : null,
       commentList: commentListInfo
     };
     return result;
