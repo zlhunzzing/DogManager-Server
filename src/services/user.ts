@@ -50,6 +50,12 @@ const makeCommentList = async (eventUrl, commentId) => {
     };
   });
   await commentListInfo.reverse();
+  const bestComment = commentListInfo.reduce((prev, current) =>
+    prev.thumb >= current.thumb ? prev : current
+  );
+  const bestCommentIndex = commentListInfo.indexOf(bestComment);
+  commentListInfo.splice(bestCommentIndex, 1);
+  commentListInfo.unshift(bestComment);
   return commentListInfo;
 };
 
