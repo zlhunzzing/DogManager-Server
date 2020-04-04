@@ -33,7 +33,7 @@ const dataForCreateEvent = (num: number = 1): object => {
     buttonImage: "button image",
     bannerImage: "banner image",
     pageImage: "page image",
-    couponCode: "coupon code"
+    couponCode: "coupon code",
   };
 };
 
@@ -45,7 +45,7 @@ describe("Implemented testcase", () => {
     await createTypeormConnection();
     const adminInfo = {
       email: "admin@dogmate.com",
-      password: "1234"
+      password: "1234",
     };
     await getRepository(Admin).save(adminInfo);
     const shasum = crypto.createHmac("sha512", process.env.CRYPTO_SECRET_KEY);
@@ -55,7 +55,7 @@ describe("Implemented testcase", () => {
       password: shasum.digest("hex"),
       name: "testUser",
       mobile: "010-0000-0000",
-      address: "test address"
+      address: "test address",
     };
     await getRepository(User).save(userInfo);
     chai
@@ -63,7 +63,7 @@ describe("Implemented testcase", () => {
       .post("/api/admin/signin")
       .send({
         email: "admin@dogmate.com",
-        password: "1234"
+        password: "1234",
       })
       .end((err, res) => {
         adminToken = res.body.token;
@@ -73,7 +73,7 @@ describe("Implemented testcase", () => {
       .post("/api/user/signin")
       .send({
         email: "user1@dogmate.com",
-        password: "1234"
+        password: "1234",
       })
       .end((err, res) => {
         userToken = res.body.token;
@@ -90,7 +90,7 @@ describe("Implemented testcase", () => {
       await getRepository(Events).save(data);
     });
     describe("POST /api/admin/events/entry", () => {
-      it("should create a new event", done => {
+      it("should create a new event", (done) => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/admin/events/entry")
@@ -109,7 +109,7 @@ describe("Implemented testcase", () => {
             done();
           });
       });
-      it("If the detailPageUrl is duplicated, the status code 409 must be returned", done => {
+      it("If the detailPageUrl is duplicated, the status code 409 must be returned", (done) => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/admin/events/entry")
@@ -132,7 +132,7 @@ describe("Implemented testcase", () => {
     });
 
     describe("GET /api/admin/events/list", () => {
-      it("should get all event lists", done => {
+      it("should get all event lists", (done) => {
         const agent = chai.request.agent(app);
         agent
           .get("/api/admin/events/list")
@@ -147,7 +147,7 @@ describe("Implemented testcase", () => {
     });
 
     describe("GET /api/admin/events/entry/:id", () => {
-      it("should get information of selected event", done => {
+      it("should get information of selected event", (done) => {
         const agent = chai.request.agent(app);
         agent
           .get("/api/admin/events/entry/1")
@@ -169,7 +169,7 @@ describe("Implemented testcase", () => {
               "updatedAt",
               "isDeleted",
               "couponName",
-              "couponList"
+              "couponList",
             ]);
             done();
           });
@@ -177,7 +177,7 @@ describe("Implemented testcase", () => {
     });
 
     describe("PUT /api/admin/events/entry/:id", () => {
-      it("should edit a information of event", done => {
+      it("should edit a information of event", (done) => {
         const agent = chai.request.agent(app);
         agent
           .put("/api/admin/events/entry/1")
@@ -202,7 +202,7 @@ describe("Implemented testcase", () => {
               });
           });
       });
-      it("If the detailPageUrl is duplicated, the status code 409 must be returned", done => {
+      it("If the detailPageUrl is duplicated, the status code 409 must be returned", (done) => {
         const agent = chai.request.agent(app);
         agent
           .put("/api/admin/events/entry/1")
@@ -225,7 +225,7 @@ describe("Implemented testcase", () => {
     });
 
     describe("DELETE /api/admin/events/entry/:id", () => {
-      it("should delete event", done => {
+      it("should delete event", (done) => {
         const agent = chai.request.agent(app);
         agent
           .delete("/api/admin/events/entry/1")
@@ -245,12 +245,12 @@ describe("Implemented testcase", () => {
     });
   });
 
-  xdescribe("LOGIN API TEST", () => {
+  describe("LOGIN API TEST", () => {
     describe("POST /api/admin/signin", () => {
       beforeEach(async () => {
         const adminData = {
           email: "admin@dogmate.com",
-          password: "1234"
+          password: "1234",
         };
         await getRepository(Admin).save(adminData);
       });
@@ -258,13 +258,13 @@ describe("Implemented testcase", () => {
         const repository = await getRepository(Admin);
         await repository.query(`TRUNCATE TABLE admin;`);
       });
-      it("should login with admin's ID", done => {
+      it("should login with admin's ID", (done) => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/admin/signin")
           .send({
             email: "admin@dogmate.com",
-            password: "1234"
+            password: "1234",
           })
           .end((err, res) => {
             if (err) done(err);
@@ -273,13 +273,13 @@ describe("Implemented testcase", () => {
             done();
           });
       });
-      it("should get 409 status code when send non-correct ID", done => {
+      it("should get 409 status code when send non-correct ID", (done) => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/admin/signin")
           .send({
             email: "nonadmin@dogmate.com",
-            password: "1234"
+            password: "1234",
           })
           .end((err, res) => {
             if (err) done(err);
@@ -296,7 +296,7 @@ describe("Implemented testcase", () => {
           email: "user2@dogmate.com",
           password: "1234",
           mobile: "4321",
-          address: "address"
+          address: "address",
         };
         await getRepository(User).save(userData);
       });
@@ -304,7 +304,7 @@ describe("Implemented testcase", () => {
         const repository = await getRepository(User);
         await repository.query(`TRUNCATE TABLE user;`);
       });
-      it("it should response 201 status code with user info to signup data", done => {
+      it("it should response 201 status code with user info to signup data", (done) => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/user/signup")
@@ -313,7 +313,7 @@ describe("Implemented testcase", () => {
             email: "user@dogmate.com",
             password: "1234",
             mobile: "1234",
-            address: "string"
+            address: "string",
           })
           .end((err, res) => {
             if (err) done(err);
@@ -321,7 +321,7 @@ describe("Implemented testcase", () => {
             done();
           });
       });
-      it("should send 409 status code when email is already exist", done => {
+      it("should send 409 status code when email is already exist", (done) => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/user/signup")
@@ -330,7 +330,7 @@ describe("Implemented testcase", () => {
             email: "user2@dogmate.com",
             password: "1234",
             mobile: "1234",
-            address: "string"
+            address: "string",
           })
           .end((err, res) => {
             if (err) done(err);
@@ -348,20 +348,20 @@ describe("Implemented testcase", () => {
           email: "user@dogmate.com",
           password: "1234",
           mobile: "1234",
-          address: "string"
+          address: "string",
         });
       });
       after(async () => {
         const repository = await getRepository(User);
         await repository.query(`TRUNCATE TABLE user;`);
       });
-      it("should have a token", done => {
+      it("should have a token", (done) => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/user/signin")
           .send({
             email: "user@dogmate.com",
-            password: "1234"
+            password: "1234",
           })
           .end((err, res) => {
             if (err) done(err);
@@ -370,13 +370,13 @@ describe("Implemented testcase", () => {
             done();
           });
       });
-      it("should send 409 status code when user ID is not exist", done => {
+      it("should send 409 status code when user ID is not exist", (done) => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/user/signin")
           .send({
             email: "test@dogmate.com",
-            password: "1234"
+            password: "1234",
           })
           .end((err, res) => {
             if (err) done(err);
@@ -388,7 +388,7 @@ describe("Implemented testcase", () => {
     });
   });
 
-  xdescribe("COUPON API TEST", () => {
+  describe("COUPON API TEST", () => {
     afterEach(async () => {
       const CouponTable = await getRepository(Coupon);
       await CouponTable.query(`TRUNCATE TABLE coupon;`);
@@ -402,11 +402,11 @@ describe("Implemented testcase", () => {
           couponCode: "@second",
           description: "this is first coupon",
           period: 7,
-          discount: "20%"
+          discount: "20%",
         };
         await getRepository(Coupon).save(couponData);
       });
-      it("should create a new coupon", done => {
+      it("should create a new coupon", (done) => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/admin/coupon")
@@ -416,14 +416,14 @@ describe("Implemented testcase", () => {
             couponCode: "@first",
             description: "this is first coupon",
             period: 7,
-            discount: "20%"
+            discount: "20%",
           })
           .end((err, res) => {
             expect(res).to.have.status(201);
             done();
           });
       });
-      it("should send message and 409 code when couponName is already exist", done => {
+      it("should send message and 409 code when couponName is already exist", (done) => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/admin/coupon")
@@ -433,7 +433,7 @@ describe("Implemented testcase", () => {
             couponCode: "@first",
             description: "this is first coupon",
             period: 7,
-            discount: "20%"
+            discount: "20%",
           })
           .end((err, res) => {
             expect(res).to.have.status(409);
@@ -441,7 +441,7 @@ describe("Implemented testcase", () => {
             done();
           });
       });
-      it("should send message and 409 code when couponCode is already exist", done => {
+      it("should send message and 409 code when couponCode is already exist", (done) => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/admin/coupon")
@@ -451,7 +451,7 @@ describe("Implemented testcase", () => {
             couponCode: "@second",
             description: "this is first coupon",
             period: 7,
-            discount: "20%"
+            discount: "20%",
           })
           .end((err, res) => {
             expect(res).to.have.status(409);
@@ -467,7 +467,7 @@ describe("Implemented testcase", () => {
           email: "user@dogmate.com",
           password: "1234",
           mobile: "1234",
-          address: "string"
+          address: "string",
         };
         await getRepository(User).save(userData);
       });
@@ -482,21 +482,21 @@ describe("Implemented testcase", () => {
             couponCode: "testCoupon",
             description: "thanks",
             period: 7,
-            discount: "50"
+            discount: "50",
           });
       });
       afterEach(async () => {
         const UserCouponTable = await getRepository(UserCoupon);
         await UserCouponTable.query(`TRUNCATE TABLE user_coupon;`);
       });
-      it("should assign a coupon to user", done => {
+      it("should assign a coupon to user", (done) => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/user/coupon")
           .set("Authorization", userToken)
           .send({
             couponCode: "testCoupon",
-            expiredAt: "202104010200"
+            expiredAt: "202104010200",
           })
           .end(async (err, res) => {
             if (err) done(err);
@@ -506,23 +506,23 @@ describe("Implemented testcase", () => {
             done();
           });
       });
-      it("should not assign a coupon when user has that coupon already", done => {
+      it("should not assign a coupon when user has that coupon already", (done) => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/user/coupon")
           .set("Authorization", userToken)
           .send({
             couponCode: "testCoupon",
-            expiredAt: "202104010200"
+            expiredAt: "202104010200",
           })
-          .then(res => {
+          .then((res) => {
             expect(res).to.have.status(201);
             agent
               .post("/api/user/coupon")
               .set("Authorization", userToken)
               .send({
                 couponCode: "testCoupon",
-                expiredAt: "202104010200"
+                expiredAt: "202104010200",
               })
               .end((err, res2) => {
                 if (err) done(err);
@@ -540,19 +540,19 @@ describe("Implemented testcase", () => {
           couponCode: "code1",
           description: "first coupon",
           period: 7,
-          discount: "10%"
+          discount: "10%",
         };
         const couponData2 = {
           couponName: "coupon2",
           couponCode: "code2",
           description: "second coupon",
           period: 7,
-          discount: "10%"
+          discount: "10%",
         };
         const arr = [couponData1, couponData2];
         await getRepository(Coupon).save(arr);
       });
-      it("should get all coupon list", done => {
+      it("should get all coupon list", (done) => {
         const agent = chai.request.agent(app);
         agent
           .get("/api/admin/coupon/list")
@@ -574,7 +574,7 @@ describe("Implemented testcase", () => {
           email: "user@dogmate.com",
           password: "1234",
           mobile: "12341234",
-          address: "1"
+          address: "1",
         });
       });
       // .set("Authorization", getUserToken());
@@ -588,18 +588,18 @@ describe("Implemented testcase", () => {
             couponCode: "code2",
             description: "second coupon",
             period: 7,
-            discount: "10%"
+            discount: "10%",
           });
         await agent
           .post("/api/user/coupon")
           .send({
             couponCode: "code2",
-            expiredAt: "202104010200"
+            expiredAt: "202104010200",
           })
           .set("Authorization", userToken);
       });
 
-      it("should get user's coupons", done => {
+      it("should get user's coupons", (done) => {
         const agent = chai.request.agent(app);
         agent
           .get("/api/user/coupon/list")
@@ -611,7 +611,7 @@ describe("Implemented testcase", () => {
             expect(res.body.couponList[0]).to.has.all.keys([
               "couponName",
               "description",
-              "expiredAt"
+              "expiredAt",
             ]);
             done();
           });
@@ -624,24 +624,24 @@ describe("Implemented testcase", () => {
           couponCode: "code1",
           description: "first coupon",
           period: 7,
-          discount: "10%"
+          discount: "10%",
         };
         const couponData2 = {
           couponName: "coupon2",
           couponCode: "code2",
           description: "second coupon",
           period: 7,
-          discount: "10%"
+          discount: "10%",
         };
         const arr = [couponData1, couponData2];
         await getRepository(Coupon).save(arr);
       });
-      it("should delete coupon", done => {
+      it("should delete coupon", (done) => {
         const agent = chai.request.agent(app);
         agent
           .delete("/api/admin/coupon/2")
           .set("Authorization", adminToken)
-          .then(res1 => {
+          .then((res1) => {
             expect(res1).to.have.status(200);
             agent
               .get("/api/admin/coupon/list")
@@ -662,17 +662,17 @@ describe("Implemented testcase", () => {
           couponCode: "@test",
           description: "this is test coupon",
           period: 7,
-          discount: "10%"
+          discount: "10%",
         };
         await getRepository(Coupon).save(couponData);
         const userCouponData = {
           couponId: 1,
           userId: 1,
-          expiredAt: "202005011200"
+          expiredAt: "202005011200",
         };
         await getRepository(UserCoupon).save(userCouponData);
       });
-      it("should get user's coupon list", done => {
+      it("should get user's coupon list", (done) => {
         const agent = chai.request.agent(app);
         agent
           .get("/api/admin/user/coupon/list")
@@ -688,7 +688,7 @@ describe("Implemented testcase", () => {
               "couponCode",
               "assignedAt",
               "expiredAt",
-              "couponState"
+              "couponState",
             ]);
             done();
           });
@@ -696,7 +696,7 @@ describe("Implemented testcase", () => {
     });
   });
 
-  xdescribe("COMMENT API TEST", () => {
+  describe("COMMENT API TEST", () => {
     afterEach(async () => {
       const CouponTable = await getRepository(Comment);
       await CouponTable.query(`TRUNCATE TABLE comment;`);
@@ -709,16 +709,16 @@ describe("Implemented testcase", () => {
         const data = dataForCreateEvent(1);
         await getRepository(Events).save(data);
       });
-      it("댓글을 추가할 수 있어야 한다.", done => {
+      it("댓글을 추가할 수 있어야 한다.", (done) => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/user/comment/entry")
           .set("Authorization", userToken)
           .send({
             content: "test content",
-            eventId: 1
+            eventId: 1,
           })
-          .then(res => {
+          .then((res) => {
             expect(res).to.have.status(201);
             expect(res.body.commentList).to.have.length(1);
             done();
@@ -734,20 +734,20 @@ describe("Implemented testcase", () => {
         const comment = {
           content: "testContent",
           userId: 1,
-          eventId: 1
+          eventId: 1,
         };
         await getRepository(Comment).save(comment);
       });
-      it("댓글 수정할 수 있어야 한다.", done => {
+      it("댓글 수정할 수 있어야 한다.", (done) => {
         const agent = chai.request.agent(app);
         agent
           .put("/api/user/comment/entry/1")
           .set("Authorization", userToken)
           .send({
             content: "testContent2",
-            eventId: 1
+            eventId: 1,
           })
-          .then(res => {
+          .then((res) => {
             expect(res).to.have.status(200);
             expect(res.body.commentList[0].content).to.equal("testContent2");
             done();
@@ -763,16 +763,16 @@ describe("Implemented testcase", () => {
         const comment = {
           content: "testContent",
           userId: 1,
-          eventId: 1
+          eventId: 1,
         };
         await getRepository(Comment).save(comment);
       });
-      it("댓글을 삭제할 수 있어야 한다.", done => {
+      it("댓글을 삭제할 수 있어야 한다.", (done) => {
         const agent = chai.request.agent(app);
         agent
           .delete("/api/user/comment/entry/1")
           .set("Authorization", userToken)
-          .then(res => {
+          .then((res) => {
             expect(res).to.have.status(200);
             expect(res.body.commentList).to.have.length(0);
             done();
@@ -786,11 +786,11 @@ describe("Implemented testcase", () => {
         const commentData = {
           content: "this is test",
           eventId: 1,
-          userId: 1
+          userId: 1,
         };
         await getRepository(Comment).save(commentData);
       });
-      it("should add thumb to comment", done => {
+      it("should add thumb to comment", (done) => {
         const agent = chai.request.agent(app);
         agent
           .post("/api/user/comment/entry/thumb/1")
@@ -811,11 +811,11 @@ describe("Implemented testcase", () => {
           content: "this is test",
           eventId: 1,
           userId: 1,
-          thumb: 1
+          thumb: 1,
         };
         await getRepository(Comment).save(commentData);
       });
-      it("should delete thumb to comment", done => {
+      it("should delete thumb to comment", (done) => {
         const agent = chai.request.agent(app);
         agent
           .delete("/api/user/comment/entry/thumb/1")
@@ -836,16 +836,16 @@ describe("Implemented testcase", () => {
           content: "this is test",
           eventId: 1,
           userId: 1,
-          thumb: 1
+          thumb: 1,
         };
         const userThumbsData = {
           userId: 1,
-          commentId: 1
+          commentId: 1,
         };
         await getRepository(Comment).save(commentData);
         await getRepository(UserThumbs).save(userThumbsData);
       });
-      it("should get user's thumbs list", done => {
+      it("should get user's thumbs list", (done) => {
         const agent = chai.request.agent(app);
         agent
           .get("/api/user/thumb/list/detail1")
