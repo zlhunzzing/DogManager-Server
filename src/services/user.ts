@@ -11,7 +11,7 @@ import {
   EventsModels,
   UserModels,
   UserCouponModels,
-  UserThumbsModels
+  UserThumbsModels,
 } from "../models";
 
 dotenv.config();
@@ -33,8 +33,8 @@ const makeCommentList = async (eventUrl, commentId) => {
 
   const commentInfo = await commentModels.findWithEventId(eventInfo.id);
   const userInfo = await userModels.findWithCommentInfoList(commentInfo);
-  const commentListInfo = commentInfo.map(x => {
-    const filteredUserInfo = userInfo.filter(y => {
+  const commentListInfo = commentInfo.map((x) => {
+    const filteredUserInfo = userInfo.filter((y) => {
       return y.id === x.userId;
     });
     const m = moment(new Date(x.createdAt));
@@ -46,13 +46,15 @@ const makeCommentList = async (eventUrl, commentId) => {
       thumb: x.thumb,
       isDeleted: x.isDeleted,
       createdAt: timeData,
-      userName: filteredUserInfo[0].name
+      userName: filteredUserInfo[0].name,
     };
   });
   await commentListInfo.reverse();
+  if (!commentListInfo.length) return [];
   const bestComment = commentListInfo.reduce((prev, current) =>
     prev.thumb >= current.thumb ? prev : current
   );
+
   const bestCommentIndex = commentListInfo.indexOf(bestComment);
   commentListInfo.splice(bestCommentIndex, 1);
   commentListInfo.unshift(bestComment);
@@ -101,7 +103,7 @@ export default class UserService {
     const result = {
       ...eventInfo,
       period: couponInfo ? couponInfo.period : null,
-      commentList: commentListInfo
+      commentList: commentListInfo,
     };
     return result;
   }
@@ -131,11 +133,11 @@ export default class UserService {
         {
           id: result.id,
           email: result.email,
-          isUser: true
+          isUser: true,
         },
         process.env.JWT_USER_SECRET_KEY,
         {
-          expiresIn: "1h"
+          expiresIn: "1h",
         }
       );
       return { token, userId: result.id };
@@ -152,7 +154,7 @@ export default class UserService {
     const recentTime = m.format("YYYYMMDDHHmm");
 
     const filteredUserCouponInfo = [];
-    await userCouponInfo.forEach(async x => {
+    await userCouponInfo.forEach(async (x) => {
       if (Number(x.expiredAt) > Number(recentTime)) {
         filteredUserCouponInfo.push(x);
       } else {
@@ -168,7 +170,7 @@ export default class UserService {
       result.push({
         couponName: couponInfo[i].couponName,
         description: couponInfo[i].description,
-        expiredAt: filteredUserCouponInfo[i].expiredAt
+        expiredAt: filteredUserCouponInfo[i].expiredAt,
       });
     }
     return result;
@@ -190,7 +192,7 @@ export default class UserService {
     const newCouponData = {
       couponId: coupon.id,
       userId: tokenInfo.id,
-      expiredAt: couponData.expiredAt
+      expiredAt: couponData.expiredAt,
     };
     await userCouponModels.save(newCouponData);
   }
@@ -224,7 +226,7 @@ export default class UserService {
   async addCommentService(commentData, tokenInfo): Promise<object> {
     const forInsertData = {
       ...commentData,
-      userId: tokenInfo.id
+      userId: tokenInfo.id,
     };
     await commentModels.save(forInsertData);
 
@@ -246,7 +248,7 @@ export default class UserService {
 
     const thumbData = {
       userId: tokenInfo.id,
-      commentId
+      commentId,
     };
     await userThumbsModels.save(thumbData);
     const commentIdArr = await makeUserThumbsList(null, commentId, tokenInfo);
@@ -261,7 +263,7 @@ export default class UserService {
     await commentModels.save(comment);
     await userThumbsModels.delete({
       userId: tokenInfo.id,
-      commentId: Number(commentId)
+      commentId: Number(commentId),
     });
 
     const commentIdArr = await makeUserThumbsList(null, commentId, tokenInfo);

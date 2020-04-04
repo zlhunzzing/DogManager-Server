@@ -10,7 +10,7 @@ import {
   EventsModels,
   UserModels,
   UserCouponModels,
-  RoomModels
+  RoomModels,
 } from "../models";
 
 dotenv.config();
@@ -36,7 +36,7 @@ export default class AdminService {
     const forInsertData = {
       ...eventData,
       detailPageUrl: eventData.detailPageUrl ? eventData.detailPageUrl : null,
-      couponCode: eventData.couponCode ? eventData.couponCode : null
+      couponCode: eventData.couponCode ? eventData.couponCode : null,
     };
     await eventsModels.save(forInsertData);
   }
@@ -63,7 +63,7 @@ export default class AdminService {
       bannerImage: eventData.bannerImage
         ? eventData.bannerImage
         : result.bannerImage,
-      pageImage: eventData.pageImage ? eventData.pageImage : result.pageImage
+      pageImage: eventData.pageImage ? eventData.pageImage : result.pageImage,
     };
     await eventsModels.save(updatedEvent);
   }
@@ -82,7 +82,7 @@ export default class AdminService {
     const result = {
       ...eventInfo,
       couponName: couponInfo ? couponInfo.couponName : null,
-      couponList: couponListInfo ? couponListInfo : null
+      couponList: couponListInfo ? couponListInfo : null,
     };
     return result;
   }
@@ -103,11 +103,11 @@ export default class AdminService {
         {
           id: result.id,
           email,
-          isUser: false
+          isUser: false,
         },
         process.env.JWT_ADMIN_SECRET_KEY,
         {
-          expiresIn: "1h"
+          expiresIn: "1h",
         }
       );
       return { token };
@@ -147,7 +147,7 @@ export default class AdminService {
     // UserCoupon 테이블에서 해당쿠폰이 들어간 모든 열의 isDeleted를
     // couponState.canceled 로 변경
     const UserCouponList = await userCouponModels.findWithCouponId(result.id);
-    const couponListForCancel = await UserCouponList.map(x => {
+    const couponListForCancel = await UserCouponList.map((x) => {
       x.couponState = COUPON_STATE.CANCELED;
       return x;
     });
@@ -161,11 +161,11 @@ export default class AdminService {
 
     const couponInfo = await couponModels.findFilter(userCouponInfo);
 
-    const result = userCouponInfo.map(x => {
-      const filteredUserInfo = userInfo.filter(y => {
+    const result = userCouponInfo.map((x) => {
+      const filteredUserInfo = userInfo.filter((y) => {
         return y.id === x.userId;
       });
-      const filteredCouponInfo = couponInfo.filter(y => {
+      const filteredCouponInfo = couponInfo.filter((y) => {
         return y.id === x.couponId;
       });
 
@@ -179,7 +179,7 @@ export default class AdminService {
         couponCode: filteredCouponInfo[0].couponCode,
         assignedAt: timeData,
         expiredAt: x.expiredAt,
-        couponState: x.couponState
+        couponState: x.couponState,
       };
     });
     return { couponList: result };
@@ -195,6 +195,15 @@ export default class AdminService {
     for (let i = 0; i < userInfoList.length; i++) {
       userInfoList[i]["adminCheck"] = roomList[i].adminCheck;
     }
-    return { roomList: userInfoList };
+
+    const sortedUserInfoList = [];
+    for (let i = 0; i < userInfoList.length; i++) {
+      if (userInfoList[i]["adminCheck"]) {
+        sortedUserInfoList.push(userInfoList[i]);
+      } else {
+        sortedUserInfoList.unshift(userInfoList[i]);
+      }
+    }
+    return { roomList: sortedUserInfoList };
   }
 }

@@ -20,7 +20,7 @@ const verifyToken = (token, secretKeyList) => {
   });
 };
 
-const transformTime = async messages => {
+const transformTime = async (messages) => {
   for (let i = 0; i < messages.length; i++) {
     const m = moment(new Date(messages[i].createdAt));
     messages[i].createdAt = m.format("YYYYMMDDHHmm");
@@ -29,14 +29,14 @@ const transformTime = async messages => {
 };
 
 export default function socketInfo(nsp) {
-  return socket => {
+  return (socket) => {
     console.log("socket connected");
-    socket.on("login", async data => {
+    socket.on("login", async (data) => {
       let tokenInfo;
       try {
         tokenInfo = await verifyToken(data.token, [
           process.env.JWT_ADMIN_SECRET_KEY,
-          process.env.JWT_USER_SECRET_KEY
+          process.env.JWT_USER_SECRET_KEY,
         ]);
       } catch (err) {
         nsp.emit("error", err);
@@ -53,9 +53,20 @@ export default function socketInfo(nsp) {
         } else {
           await roomModels.save({ userId: tokenInfo.id });
           const roomInfo2 = await roomModels.findOneWithUserId(tokenInfo.id);
+
+          const chatData = {
+            content: "안녕하세요! 무엇을 도와드릴까요?",
+            roomId: roomInfo2.id,
+            writer: "admin",
+          };
+          await chatModels.save(chatData);
+
           const room = (socket.room = roomInfo2.id);
           socket.join(room);
-          socket.emit("chatLog", []);
+          const messages = await chatModels.findWithRoomId(roomInfo2.id);
+          const result = await transformTime(messages);
+
+          socket.emit("chatLog", result);
         }
 
         // 관리자일때
@@ -68,12 +79,12 @@ export default function socketInfo(nsp) {
         socket.emit("chatLog", result);
       }
     });
-    socket.on("chat", async data => {
+    socket.on("chat", async (data) => {
       let tokenInfo;
       try {
         tokenInfo = await verifyToken(data.token, [
           process.env.JWT_ADMIN_SECRET_KEY,
-          process.env.JWT_USER_SECRET_KEY
+          process.env.JWT_USER_SECRET_KEY,
         ]);
       } catch (err) {
         nsp.emit("error", err);
@@ -86,7 +97,7 @@ export default function socketInfo(nsp) {
         const chatData = {
           content: data.content,
           roomId: roomInfo.id,
-          writer: "user"
+          writer: "user",
         };
         await chatModels.save(chatData);
         roomInfo.adminCheck = false;
@@ -105,7 +116,7 @@ export default function socketInfo(nsp) {
         const chatData = {
           content: data.content,
           roomId: roomInfo.id,
-          writer: "admin"
+          writer: "admin",
         };
         await chatModels.save(chatData);
         const messages = await chatModels.findWithRoomId(roomInfo.id);
