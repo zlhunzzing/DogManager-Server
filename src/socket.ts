@@ -54,19 +54,19 @@ export default function socketInfo(nsp) {
           await roomModels.save({ userId: tokenInfo.id });
           const roomInfo2 = await roomModels.findOneWithUserId(tokenInfo.id);
 
-          const chatData = {
-            content: "안녕하세요! 무엇을 도와드릴까요?",
-            roomId: roomInfo2.id,
-            writer: "admin",
-          };
-          await chatModels.save(chatData);
+          // const chatData = {
+          //   content: "안녕하세요! 무엇을 도와드릴까요?",
+          //   roomId: roomInfo2.id,
+          //   writer: "admin",
+          // };
+          // await chatModels.save(chatData);
 
           const room = (socket.room = roomInfo2.id);
           socket.join(room);
-          const messages = await chatModels.findWithRoomId(roomInfo2.id);
-          const result = await transformTime(messages);
-
-          socket.emit("chatLog", result);
+          // const messages = await chatModels.findWithRoomId(roomInfo2.id);
+          // const result = await transformTime(messages);
+          // console.log(result);
+          socket.emit("chatLog", []);
         }
 
         // 관리자일때

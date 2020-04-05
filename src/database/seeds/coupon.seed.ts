@@ -6,26 +6,26 @@ export default class CreateUsers implements Seeder {
   public async run(factory: Factory, connection: Connection): Promise<any> {
     const couponData = [
       {
-        couponName: "first coupon",
-        couponCode: "@first",
-        description: "this is first coupon",
+        couponName: "첫이용 50% 할인 쿠폰",
+        couponCode: "@dogmate1",
+        description: "첫 이용시 50% 할인 이벤트용 쿠폰",
         period: 7,
-        discount: "10%"
+        discount: "50%",
       },
       {
-        couponName: "second coupon",
-        couponCode: "@second",
-        description: "this is second coupon",
-        period: 7,
-        discount: "20%"
+        couponName: "객실 10% 할인 쿠폰",
+        couponCode: "@dogmate2",
+        description: "프레이저 플레이스 객실 패키지 10% 할인",
+        period: 30,
+        discount: "10%",
       },
       {
-        couponName: "third coupon",
-        couponCode: "@third",
-        description: "this is third coupon",
-        period: 7,
-        discount: "30%"
-      }
+        couponName: "방문탁묘 오픈기념 쿠폰",
+        couponCode: "@dogmate3",
+        description: "방문탁묘 오픈기념 7500원 할인 쿠폰",
+        period: 14,
+        discount: "7500원",
+      },
     ];
     await connection.getRepository(Coupon).save(couponData);
   }

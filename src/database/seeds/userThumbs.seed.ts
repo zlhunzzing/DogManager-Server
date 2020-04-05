@@ -7,40 +7,32 @@ export default class CreateUsers implements Seeder {
     const userThumbsData = [
       {
         userId: 1,
-        commentId: 1
-      },
-      {
-        userId: 1,
-        commentId: 4
+        commentId: 1,
       },
       {
         userId: 2,
-        commentId: 1
+        commentId: 1,
       },
       {
         userId: 2,
-        commentId: 3
-      },
-      {
-        userId: 2,
-        commentId: 7
+        commentId: 2,
       },
       {
         userId: 3,
-        commentId: 1
+        commentId: 1,
       },
       {
         userId: 3,
-        commentId: 2
+        commentId: 2,
       },
       {
         userId: 4,
-        commentId: 1
+        commentId: 1,
       },
       {
         userId: 4,
-        commentId: 2
-      }
+        commentId: 2,
+      },
     ];
     await connection.getRepository(UserThumbs).save(userThumbsData);
   }
