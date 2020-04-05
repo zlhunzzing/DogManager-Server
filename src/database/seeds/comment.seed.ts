@@ -6,60 +6,18 @@ export default class CreateUsers implements Seeder {
   public async run(factory: Factory, connection: Connection): Promise<any> {
     const comments = [
       {
-        content: "my name is kirca322",
+        content:
+          "처음 이용해보는 서비스라 가격대가 좀 부담됐었는데 너무 좋은 이벤트 같아요!",
         userId: 1,
         eventId: 1,
-        thumb: 4
+        thumb: 8,
       },
       {
-        content: "my name is kirca322",
-        userId: 1,
-        eventId: 2,
-        thumb: 2
-      },
-      {
-        content: "my name is kirca322",
-        userId: 1,
-        eventId: 3,
-        thumb: 1
-      },
-      {
-        content: "my name is kim1",
+        content: "반값이나 할인이라니.....",
         userId: 2,
         eventId: 1,
-        thumb: 1
+        thumb: 3,
       },
-      {
-        content: "my name is kim1",
-        userId: 2,
-        eventId: 2
-      },
-      {
-        content: "my name is kim2",
-        userId: 3,
-        eventId: 1
-      },
-      {
-        content: "my name is kim2",
-        userId: 3,
-        eventId: 2,
-        thumb: 1
-      },
-      {
-        content: "my name is kim2",
-        userId: 3,
-        eventId: 3
-      },
-      {
-        content: "my name is kim3",
-        userId: 4,
-        eventId: 2
-      },
-      {
-        content: "my name is kim3",
-        userId: 4,
-        eventId: 3
-      }
     ];
     await connection.getRepository(Comment).save(comments);
   }

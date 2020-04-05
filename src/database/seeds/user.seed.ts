@@ -13,33 +13,33 @@ export default class CreateUsers implements Seeder {
 
     const userData = [
       {
-        email: "kirca322@naver.com",
+        email: "user1@dogmate.com",
         password: hashedPassword,
-        address: "cheon-an",
+        address: "non",
         mobile: "010-0000-0000",
-        name: "tae sun"
+        name: "김태선",
       },
       {
-        email: "kim1@naver.com",
+        email: "user2@dogmate.com",
         password: hashedPassword,
-        address: "cheon-an",
+        address: "non",
         mobile: "010-0000-0000",
-        name: "kim1"
+        name: "김지훈",
       },
       {
-        email: "kim2@naver.com",
+        email: "user3@dogmate.com",
         password: hashedPassword,
-        address: "cheon-an",
+        address: "non",
         mobile: "010-0000-0000",
-        name: "kim2"
+        name: "윤민아",
       },
       {
-        email: "kim3@naver.com",
+        email: "user4@dogmate.com",
         password: hashedPassword,
-        address: "cheon-an",
+        address: "non",
         mobile: "010-0000-0000",
-        name: "kim3"
-      }
+        name: "정의영",
+      },
     ];
     await connection.getRepository(User).save(userData);
   }
