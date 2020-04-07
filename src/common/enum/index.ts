@@ -1,0 +1,5 @@
+export enum COUPON_STATE {
+  ENABLE,
+  DISABLE,
+  CANCELED
+}

@@ -1,75 +1,115 @@
+import dotenv from "dotenv";
 import { Request, Response } from "express";
 import adminService from "../../services/admin";
-import { Events } from "../../entity/Events";
-import { getRepository } from "typeorm";
+import { MulterFile, Req } from "../../common/interface";
 
+dotenv.config();
 const service = new adminService();
 
-export interface MulterFile {
-  key: string; // Available using `S3`.
-  path: string; // Available using `DiskStorage`.
-  mimetype: string;
-  originalname: string;
-  size: number;
-}
-
-export default {
-  addEventController: async (
-    req: Request & { files: MulterFile[] },
+export default class AdminController {
+  async addEventController(
+    req: any & { files: MulterFile[] },
     res: Response
-  ): Promise<void> => {
-    const data = req.body;
-    if (req.files["pageImage"]) {
-      data.pageImage = req.files["pageImage"][0].location;
-      data.bannerImage = req.files["bannerImage"][0].location;
-      data.buttonImage = req.files["buttonImage"][0].location;
+  ): Promise<void> {
+    const eventData = req.body;
+    if (process.env.NODE_ENV !== "test") {
+      eventData.pageImage = req.files["pageImage"][0].location;
+      eventData.bannerImage = req.files["bannerImage"][0].location;
+      eventData.buttonImage = req.files["buttonImage"][0].location;
     }
-    const result = await service.addEventService(data);
-    if (result["key"] === "detailPageUrl") {
-      res.status(409).send("detailPageUrl");
-    } else if (result["key"] === "buttonUrl") {
-      res.status(409).send("buttonUrl");
-    } else {
+
+    try {
+      await service.addEventService(eventData);
       res.status(201).end();
+    } catch (err) {
+      res.status(409).send(err.message);
     }
-  },
+  }
 
-  putEventController: async (
+  async putEventController(
     req: Request & { files: MulterFile[] },
     res: Response
-  ): Promise<void> => {
-    const data = req.body;
+  ): Promise<void> {
+    const eventData = req.body;
     if (req.files["pageImage"]) {
-      data.pageImage = req.files["pageImage"][0].location;
+      eventData.pageImage = req.files["pageImage"][0].location;
     }
     if (req.files["bannerImage"]) {
-      data.bannerImage = req.files["bannerImage"][0].location;
+      eventData.bannerImage = req.files["bannerImage"][0].location;
     }
     if (req.files["buttonImage"]) {
-      data.buttonImage = req.files["buttonImage"][0].location;
+      eventData.buttonImage = req.files["buttonImage"][0].location;
     }
-    await service.putEventService(data, req.params.id);
-    res.status(200).end();
-  },
 
-  getEventListController: async (
-    req: Request,
-    res: Response
-  ): Promise<void> => {
+    try {
+      await service.putEventService(eventData, req.params.eventId);
+      res.status(200).end();
+    } catch (err) {
+      res.status(409).send(err.message);
+    }
+  }
+
+  async getEventListController(req: Request, res: Response): Promise<void> {
     const result = await service.getEventListService();
     res.status(200).json({ eventList: result });
-  },
+  }
 
-  getEventEntryController: async (
-    req: Request,
-    res: Response
-  ): Promise<void> => {
-    const result = await service.getEventEntryService(req.params.id);
+  async getEventEntryController(req: Request, res: Response): Promise<void> {
+    const result = await service.getEventEntryService(req.params.eventId);
     res.status(200).json(result);
-  },
+  }
 
-  deleteEventController: async (req: Request, res: Response): Promise<void> => {
-    await service.deleteEventService(req.params.id);
+  async deleteEventController(req: Request, res: Response): Promise<void> {
+    await service.deleteEventService(req.params.eventId);
     res.status(200).end();
   }
-};
+
+  async signinController(req: Request, res: Response): Promise<void> {
+    try {
+      const result = await service.signinService(req.body);
+      res.status(200).json(result);
+    } catch (err) {
+      res.status(409).send(err.message);
+    }
+  }
+
+  async createCouponController(req: Request, res: Response): Promise<void> {
+    try {
+      await service.createCouponService(req.body);
+      res.status(201).end();
+    } catch (err) {
+      res.status(409).send(err.message);
+    }
+  }
+
+  async getCouponListController(req: Request, res: Response): Promise<void> {
+    const couponList = await service.getCouponListService();
+    res.status(200).json({
+      couponList
+    });
+  }
+
+  async deleteCouponController(req: Request, res: Response): Promise<void> {
+    await service.deleteCouponService(req.params.couponId);
+    res.status(200).end();
+  }
+
+  async getUserCouponListController(
+    req: Request,
+    res: Response
+  ): Promise<void> {
+    const result = await service.getUserCouponListService();
+    res.status(200).json(result);
+  }
+
+  async getAdminIdController(req: Req, res: Response): Promise<void> {
+    res.status(200).json({
+      id: req.tokenData.id
+    });
+  }
+
+  async getRoomListController(req: Req, res: Response): Promise<void> {
+    const result = await service.getRoomListService();
+    res.status(200).json(result);
+  }
+}

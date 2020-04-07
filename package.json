@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha -r ts-node/register src/test/**/*.spec.ts --exit",
+    "test": "NODE_ENV=test mocha -r ts-node/register src/test/**/*.spec.ts --timeout 20000 --exit",
     "dev": "NODE_ENV=development nodemon src/app.ts",
-    "start": "NODE_ENV=production nodemon dist/app.js"
+    "start": "NODE_ENV=production nodemon dist/app.js",
+    "seed": "NODE_ENV=development ts-node ./node_modules/typeorm-seeding/dist/cli.js seed"
   },
   "repository": {
     "type": "git",
@@ -28,7 +29,8 @@
     "eslint": "^6.8.0",
     "mocha": "^7.1.0",
     "prettier": "^1.19.1",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "util": "^0.12.2"
   },
   "dependencies": {
     "@types/body-parser": "^1.19.0",
@@ -37,7 +39,11 @@
     "aws-sdk": "^2.639.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.24.0",
     "morgan": "^1.9.1",
     "multer": "^1.4.2",
     "multer-s3": "^2.9.0",
@@ -45,8 +51,11 @@
     "nodemon": "^2.0.2",
     "path": "^0.12.7",
     "reflect-metadata": "^0.1.13",
+    "socket.io": "^2.3.0",
+    "socket.io-client": "^2.3.0",
     "ts-node": "^8.6.2",
     "tslint-config-prettier": "^1.18.0",
-    "typeorm": "^0.2.24"
+    "typeorm": "^0.2.24",
+    "typeorm-seeding": "^1.2.0"
   }
 }
