@@ -18,11 +18,10 @@ app.use(bodyParser.json());
 app.use(
   cors({
     origin: [
-      "http://dogandcodemate.s3-website.ap-northeast-2.amazonaws.com",
-      "http://localhost:3000",
-      "http://shortly-client.s3-website.ap-northeast-2.amazonaws.com"
+      'http://dog-manager-s3.s3-website.ap-northeast-2.amazonaws.com',
+      'http://localhost:3000',
     ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTION'],
     credentials: true
   })
 );

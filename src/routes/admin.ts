@@ -29,7 +29,7 @@ const s3 = new AWS.S3();
 const upload = multer({
   storage: multerS3({
     s3,
-    bucket: "dogmate-image",
+    bucket: "dog-manager-s3",
     key: (req, file, cb) => {
       const extension = path.extname(file.originalname);
       cb(null, Date.now().toString() + extension);
